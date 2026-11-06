@@ -15,198 +15,241 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
-    /* Estilos inspirados en la estética moderna de Streamlit */
+    /* Paleta: Cold Chain Frost (Cadena de Frío & Hielo) */
+    :root {
+      --frost-bg: #f0f9ff;
+      --frost-card: #ffffff;
+      --frost-sidebar: #e0f2fe;
+      --frost-border: #bae6fd;
+      --frost-accent: #0284c7;
+      --frost-accent-hover: #0369a1;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc;
+      background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 50%, #e0f2fe 100%);
+      min-height: 100vh;
     }
     .st-sidebar {
-      background-color: #f1f5f9;
-      border-right: 1px solid #e2e8f0;
+      background-color: #e0f2fe;
+      border-right: 1px solid #bae6fd;
     }
     input[type=range]::-webkit-slider-thumb {
-      background: #ff4b4b;
+      background: #0284c7;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(2, 132, 199, 0.4);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid #e0f2fe;
     }
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col md:flex-row">
 
-  <!-- SIDEBAR LATERAL -->
-  <aside class="w-full md:w-80 lg:w-96 st-sidebar p-6 flex-shrink-0 flex flex-col justify-between">
+  <!-- SIDEBAR LATERAL FROST -->
+  <aside class="w-full md:w-80 lg:w-96 st-sidebar p-6 flex-shrink-0 flex flex-col justify-between shadow-sm">
     <div>
-      <div class="flex items-center gap-2 mb-6">
-        <span class="text-3xl">🍗</span>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center border border-sky-200">
+          <span class="text-2xl">❄️</span>
+        </div>
         <div>
-          <h1 class="text-xl font-bold tracking-tight text-slate-900 leading-tight">FoodShield</h1>
-          <p class="text-xs text-slate-500 font-medium">Ibagué • Nivel 10° Grado</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-black tracking-tight text-sky-950">FoodShield</h1>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-200 text-sky-800">FROST</span>
+          </div>
+          <p class="text-xs text-sky-700 font-medium">Ibagué • Nivel 10° Grado</p>
         </div>
       </div>
 
-      <div class="border-t border-slate-300 pt-4 mb-5">
-        <h2 class="text-sm uppercase tracking-wider font-semibold text-slate-600 mb-4 flex items-center gap-2">
+      <div class="border-t border-sky-300 pt-4 mb-5">
+        <h2 class="text-xs uppercase tracking-wider font-bold text-sky-800 mb-4 flex items-center gap-2">
           ⚙️ Parámetros de Simulación
         </h2>
 
         <!-- 1. Deslizador Tamb -->
-        <div class="mb-5">
+        <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
-            <label class="font-medium text-slate-700">Temp. Ambiente (<span class="italic">T</span><sub>amb</sub>):</label>
-            <span id="label-tamb" class="font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">28.0 °C</span>
+            <label class="font-semibold text-sky-950">Temp. Ambiente (<span class="italic">T</span><sub>amb</sub>):</label>
+            <span id="label-tamb" class="font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200 text-xs">28.0 °C</span>
           </div>
           <input id="input-tamb" type="range" min="20" max="35" step="0.5" value="28.0" 
-                 class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-red-500">
-          <p class="text-[11px] text-slate-500 mt-1">Clima exterior en Ibagué (20°C a 35°C).</p>
+                 class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
+          <div class="flex justify-between text-[10px] text-sky-600 mt-1 font-medium">
+            <span>20°C (Templado)</span>
+            <span>35°C (Calor Extremo)</span>
+          </div>
         </div>
 
         <!-- 2. Deslizador Tiempo -->
-        <div class="mb-5">
+        <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
-            <label class="font-medium text-slate-700">Tiempo de Trayecto (<span class="italic">t</span>):</label>
-            <span id="label-tviaje" class="font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">2.0 h</span>
+            <label class="font-semibold text-sky-950">Tiempo Trayecto (<span class="italic">t</span>):</label>
+            <span id="label-tviaje" class="font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 text-xs">2.0 h</span>
           </div>
           <input id="input-tviaje" type="range" min="0.5" max="4.0" step="0.5" value="2.0" 
-                 class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-red-500">
-          <p class="text-[11px] text-slate-500 mt-1">Duración del recorrido en horas (pasos 0.5h).</p>
+                 class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
+          <div class="flex justify-between text-[10px] text-sky-600 mt-1 font-medium">
+            <span>0.5h (Rápido)</span>
+            <span>4.0h (Retraso Severo)</span>
+          </div>
         </div>
 
         <!-- 3. Tipo de Empaque -->
-        <div class="mb-5">
-          <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de Empaque:</label>
-          <select id="select-empaque" class="w-full bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2.5 focus:ring-red-500 focus:border-red-500">
-            <option value="0.03" selected>Uninsulated Crate (k = 0.03)</option>
-            <option value="0.02">Plastic Bag (k = 0.02)</option>
-            <option value="0.01">Styrofoam Box (k = 0.01)</option>
+        <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
+          <label class="block text-sm font-semibold text-sky-950 mb-1.5">Tipo de Empaque Térmico:</label>
+          <select id="select-empaque" class="w-full bg-white border border-sky-300 text-slate-800 text-sm rounded-lg p-2.5 font-medium focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+            <option value="0.03" selected>📦 Uninsulated Crate (k = 0.03)</option>
+            <option value="0.02">🛍️ Plastic Bag (k = 0.02)</option>
+            <option value="0.01">🧊 Styrofoam Box (k = 0.01)</option>
           </select>
-          <p class="text-[11px] text-slate-500 mt-1">Menor valor de <span class="italic">k</span> = mayor aislamiento térmico.</p>
+          <p class="text-[11px] text-sky-700 mt-1.5 leading-snug">
+            <em>k = 0.01 (Icopor)</em> aísla 3 veces más que la canastilla abierta.
+          </p>
         </div>
 
         <!-- 4. Temp Inicial -->
-        <div class="mb-5">
-          <label class="block text-sm font-medium text-slate-700 mb-1">Temp. Inicial Carne (<span class="italic">T</span><sub>0</sub> en °C):</label>
+        <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
+          <div class="flex justify-between items-center mb-1 text-sm">
+            <label class="font-semibold text-sky-950">Temp. Inicial (<span class="italic">T</span><sub>0</sub>):</label>
+            <span class="text-xs font-bold text-sky-800">Refrigerado</span>
+          </div>
           <input id="input-t0" type="number" step="0.5" min="0" max="15" value="4.0" 
-                 class="w-full bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-red-500 focus:border-red-500">
-          <p class="text-[11px] text-slate-500 mt-1">Refrigeración base de salida (ideal: 4°C).</p>
+                 class="w-full bg-white border border-sky-300 text-slate-800 text-sm rounded-lg p-2 font-medium focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+          <p class="text-[11px] text-sky-700 mt-1">Salida de planta a 4.0 °C.</p>
         </div>
       </div>
     </div>
 
     <!-- Metadata inferior -->
-    <div class="pt-4 border-t border-slate-300 text-xs text-slate-500">
-      <p><strong>Carga inicial:</strong> 10 CFU/g</p>
-      <p><strong>Límite INVIMA:</strong> 1,000 CFU/g</p>
-      <p class="mt-2 text-[11px]">Res. 2674/2013 Colombia</p>
+    <div class="pt-4 border-t border-sky-300 text-xs text-sky-800 space-y-1">
+      <div class="flex justify-between">
+        <span>Carga Inicial (N<sub>0</sub>):</span>
+        <span class="font-bold">10 CFU/g</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Límite Legal INVIMA:</span>
+        <span class="font-bold text-red-600">1,000 CFU/g</span>
+      </div>
+      <p class="pt-2 text-[11px] text-sky-600 border-t border-sky-200">Resolución 2674/2013 Colombia</p>
     </div>
   </aside>
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 p-6 md:p-8 lg:p-10 overflow-y-auto">
     <!-- Header -->
-    <div class="mb-6">
-      <div class="flex items-center justify-between flex-wrap gap-2">
-        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">
-          Simulación de Crecimiento de <span class="italic text-red-600">Salmonella spp.</span>
-        </h1>
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Modelo Activo
-        </span>
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl md:text-3xl font-black text-sky-950 tracking-tight">
+            Monitoreo Térmico & Crecimiento de <span class="italic text-sky-600">Salmonella spp.</span>
+          </h1>
+        </div>
+        <p class="text-sm text-slate-600 mt-1">
+          Simulador de bioseguridad alimentaria para transporte avícola en el clima cálido de Ibagué, Tolima.
+        </p>
       </div>
-      <p class="text-sm text-slate-600 mt-1">
-        Simulador interactivo para evaluar la pérdida de cadena de frío en transporte avícola no refrigerado en la ciudad de Ibagué.
-      </p>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span> Modelo Calibrado
+      </span>
     </div>
 
     <!-- TARJETAS DE MÉTRICAS (KPIS) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div class="text-xs uppercase font-semibold text-slate-500">🌡️ Temp. Final</div>
-        <div id="kpi-temp" class="text-2xl font-bold text-slate-900 mt-1">-- °C</div>
-        <div id="kpi-temp-delta" class="text-xs font-medium text-orange-600 mt-0.5">--</div>
+      <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🌡️ Temp. Final</div>
+        <div id="kpi-temp" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- °C</div>
+        <div id="kpi-temp-delta" class="text-xs font-semibold text-orange-600 mt-0.5">--</div>
       </div>
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div class="text-xs uppercase font-semibold text-slate-500">⏱️ Tiempo Viaje</div>
-        <div id="kpi-tiempo" class="text-2xl font-bold text-slate-900 mt-1">-- h</div>
-        <div class="text-xs text-slate-400 mt-0.5">Sin refrigeración</div>
+      <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⏱️ Duración Viaje</div>
+        <div id="kpi-tiempo" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- h</div>
+        <div class="text-xs font-medium text-slate-400 mt-0.5">Sin refrigerador</div>
       </div>
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div class="text-xs uppercase font-semibold text-slate-500">🧫 Carga Final</div>
-        <div id="kpi-bact" class="text-2xl font-bold text-slate-900 mt-1">-- CFU/g</div>
-        <div id="kpi-bact-sub" class="text-xs text-slate-400 mt-0.5">Salmonella spp.</div>
+      <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🧫 Carga Final</div>
+        <div id="kpi-bact" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- CFU/g</div>
+        <div id="kpi-bact-sub" class="text-xs font-semibold mt-0.5">--</div>
       </div>
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div class="text-xs uppercase font-semibold text-slate-500">⚖️ Límite Legal</div>
-        <div class="text-2xl font-bold text-slate-900 mt-1">1,000 CFU/g</div>
-        <div class="text-xs text-slate-400 mt-0.5">Res. INVIMA 2674</div>
+      <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⚖️ Límite Legal</div>
+        <div class="text-2xl lg:text-3xl font-black text-rose-700 mt-1">1,000 CFU/g</div>
+        <div class="text-xs font-medium text-slate-400 mt-0.5">INVIMA Res. 2674</div>
       </div>
     </div>
 
     <!-- CUADRO DE ALERTA DINÁMICO -->
-    <div id="alert-box" class="p-4 rounded-xl mb-6 border transition-colors duration-300">
-      <!-- Se inyecta dinámicamente con JS -->
+    <div id="alert-box" class="p-5 rounded-2xl mb-6 shadow-sm border transition-all duration-300">
+      <!-- Inyectado dinámicamente -->
     </div>
 
     <!-- GRÁFICAS (2 COLUMNAS) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- Gráfica 1 -->
-      <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
-          📈 Curva Térmica: Temperatura vs. Tiempo
-        </h3>
+      <div class="glass-card p-5 rounded-2xl shadow-sm border border-sky-100">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-sm font-bold text-sky-950 uppercase tracking-wide flex items-center gap-2">
+            📈 Curva Térmica: Temperatura vs. Tiempo
+          </h3>
+          <span class="text-xs text-slate-400 font-mono">T(t)</span>
+        </div>
         <div id="plot-temp" class="w-full h-80"></div>
       </div>
 
       <!-- Gráfica 2 -->
-      <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
-          🔬 Crecimiento Bacteriano vs. Tiempo
-        </h3>
+      <div class="glass-card p-5 rounded-2xl shadow-sm border border-sky-100">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-sm font-bold text-sky-950 uppercase tracking-wide flex items-center gap-2">
+            🔬 Crecimiento de Salmonella spp. vs. Tiempo
+          </h3>
+          <span class="text-xs text-slate-400 font-mono">N(t)</span>
+        </div>
         <div id="plot-bact" class="w-full h-80"></div>
       </div>
     </div>
 
-    <!-- SECCIÓN ACORDEÓN: FUNDAMENTO CIENTÍFICO -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
-      <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-        📚 Fundamento Científico y Fórmulas Matemáticas
+    <!-- SECCIÓN ACORDEÓN: FUNDAMENTO CIENTÍFICO Y VALIDACIÓN -->
+    <div class="glass-card rounded-2xl shadow-sm border border-sky-100 p-6 mb-8">
+      <h3 class="text-base font-bold text-sky-950 mb-4 flex items-center gap-2">
+        📚 Fundamento Científico y Validación Biológica (10° Grado)
       </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700">
         <div class="space-y-3">
-          <h4 class="font-bold text-slate-800 border-b pb-1">1. Ley de Calentamiento de Newton</h4>
-          <div class="p-3 bg-slate-50 rounded-lg text-center font-serif text-base border border-slate-200">
+          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">1. Ley de Calentamiento de Newton</h4>
+          <div class="p-3 bg-sky-50/50 rounded-xl text-center font-serif text-base border border-sky-200">
             $$T(t) = T_{\text{amb}} + (T_0 - T_{\text{amb}}) \cdot e^{-kt}$$
           </div>
-          <ul class="list-disc list-inside space-y-1 text-xs text-slate-600">
-            <li><strong>T<sub>amb</sub>:</strong> Temperatura del aire en Ibagué ($20^\circ\text{C} - 35^\circ\text{C}$).</li>
-            <li><strong>T<sub>0</sub>:</strong> Temperatura inicial refrigerada ($4^\circ\text{C}$).</li>
-            <li><strong>k:</strong> Constante de transferencia de calor según el recipiente (min<sup>-1</sup>).</li>
-          </ul>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Modela la transferencia de calor convectivo entre el aire de Ibagué y la masa del pollo. 
+            El icopor (<em>Styrofoam</em>, $k = 0.010$) retarda el calentamiento significativamente en comparación con la canastilla abierta ($k = 0.030$).
+          </p>
         </div>
 
         <div class="space-y-3">
-          <h4 class="font-bold text-slate-800 border-b pb-1">2. Modelo de Fisión Binaria</h4>
-          <div class="p-3 bg-slate-50 rounded-lg text-center font-serif text-base border border-slate-200">
+          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">2. Modelo de Fisión Binaria Dinámica</h4>
+          <div class="p-3 bg-sky-50/50 rounded-xl text-center font-serif text-base border border-sky-200">
             $$N(t) = N_0 \cdot 2^n \quad \text{donde} \quad n = \sum \frac{\Delta t}{g(T)}$$
           </div>
-          <ul class="list-disc list-inside space-y-1 text-xs text-slate-600">
-            <li><strong>N<sub>0</sub>:</strong> Inóculo inicial ($10\text{ CFU/g}$).</li>
-            <li><strong>g(T):</strong> Tiempo de duplicación biológica. Si $T < 7^\circ\text{C}$, $g \to \infty$ (fase latente). Al entrar en zona cálida, $g$ baja hasta $\sim 25\text{ min}$.</li>
-            <li><strong>N<sub>crit</sub>:</strong> $1,000\text{ CFU/g}$ fijado por la <strong>Resolución INVIMA 2674/2013</strong>.</li>
-          </ul>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            El tiempo de duplicación $g(T)$ decrece con el calor: por debajo de $7^\circ\text{C}$ la bacteria está inactiva; pero a temperaturas superiores a $25^\circ\text{C}-35^\circ\text{C}$, se divide cada <strong>15 a 20 minutos</strong>, disparando el crecimiento exponencial.
+          </p>
         </div>
       </div>
     </div>
 
     <!-- EJECUCIÓN CON STREAMLIT (INFO) -->
-    <div class="bg-slate-900 text-slate-200 rounded-xl p-5 shadow-sm text-xs md:text-sm">
+    <div class="bg-sky-950 text-sky-100 rounded-2xl p-5 shadow-sm text-xs md:text-sm border border-sky-900">
       <div class="flex items-center justify-between mb-2">
-        <span class="font-mono text-emerald-400 font-semibold flex items-center gap-2">
+        <span class="font-mono text-sky-300 font-bold flex items-center gap-2">
           🐍 Código Streamlit nativo disponible en el repositorio (app.py)
         </span>
       </div>
-      <p class="text-slate-400 mb-2">
-        Para ejecutar la aplicación nativa de Python localmente:
+      <p class="text-sky-300 mb-2 text-xs">
+        Para ejecutar la aplicación nativa de Python localmente con Streamlit:
       </p>
-      <pre class="bg-black/60 p-3 rounded-lg font-mono text-xs text-emerald-300 overflow-x-auto">git clone https://github.com/mfgatos3/foodshield-simulator.git
+      <pre class="bg-black/40 p-3 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto border border-sky-800">git clone https://github.com/mfgatos3/foodshield-simulator.git
 cd foodshield-simulator
 pip install -r requirements.txt
 streamlit run app.py</pre>
@@ -215,21 +258,23 @@ streamlit run app.py</pre>
 
   <!-- MOTOR JAVASCRIPT DE SIMULACIÓN Y RENDERIZADO -->
   <script>
-    // Fórmulas matemáticas
+    // Ley de Newton
     function calcularTemperatura(tHoras, tAmb, t0, kMin) {
       const tMin = tHoras * 60.0;
       return tAmb + (t0 - tAmb) * Math.exp(-kMin * tMin);
     }
 
+    // Tiempo de generación calibrado para Salmonella spp. en carne fresca de pollo
     function tiempoDuplicacion(temp) {
-      if (temp < 7.0) return Infinity;
-      if (temp < 15.0) return 8.0 - (temp - 7.0) * (5.0 / 8.0);
-      if (temp < 25.0) return 3.0 - (temp - 15.0) * (1.8 / 10.0);
-      if (temp <= 45.0) return Math.max(0.42, 1.2 - (temp - 25.0) * (0.78 / 12.0));
-      return Infinity;
+      if (temp < 7.0) return Infinity; // Latencia / frío seguro
+      if (temp < 12.0) return 2.5 - (temp - 7.0) * (1.3 / 5.0); // 2.5h -> 1.2h
+      if (temp < 20.0) return 1.2 - (temp - 12.0) * (0.6 / 8.0); // 1.2h -> 0.6h (36 min)
+      if (temp < 30.0) return 0.6 - (temp - 20.0) * (0.28 / 10.0); // 36 min -> 19 min (0.32h)
+      if (temp <= 45.0) return Math.max(0.25, 0.32 - (temp - 30.0) * (0.07 / 15.0)); // 19 min -> 15 min (0.25h)
+      return Infinity; // Estrés térmico letal >45°C
     }
 
-    function simular(tViaje, tAmb, t0, kMin, n0 = 10.0, pasos = 150) {
+    function simular(tViaje, tAmb, t0, kMin, n0 = 10.0, pasos = 250) {
       const tiempos = [];
       const temps = [];
       const bacterias = [];
@@ -265,52 +310,69 @@ streamlit run app.py</pre>
       const kVal = parseFloat(document.getElementById('select-empaque').value);
       const t0 = parseFloat(document.getElementById('input-t0').value) || 4.0;
       const nCrit = 1000.0;
+      const n0 = 10.0;
 
       // Actualizar etiquetas
       document.getElementById('label-tamb').innerText = tAmb.toFixed(1) + " °C";
       document.getElementById('label-tviaje').innerText = tViaje.toFixed(1) + " h";
 
       // Ejecutar simulación
-      const data = simular(tViaje, tAmb, t0, kVal);
+      const data = simular(tViaje, tAmb, t0, kVal, n0);
       const tempFinal = data.temps[data.temps.length - 1];
       const cfuFinal = data.bacterias[data.bacterias.length - 1];
 
       // Actualizar KPIs
       document.getElementById('kpi-temp').innerText = tempFinal.toFixed(1) + " °C";
       const deltaT = tempFinal - t0;
-      document.getElementById('kpi-temp-delta').innerText = (deltaT >= 0 ? "+" : "") + deltaT.toFixed(1) + " °C vs inicio";
+      document.getElementById('kpi-temp-delta').innerText = (deltaT >= 0 ? "+" : "") + deltaT.toFixed(1) + " °C vs salida";
       document.getElementById('kpi-tiempo').innerText = tViaje.toFixed(1) + " h";
       document.getElementById('kpi-bact').innerText = Math.round(cfuFinal).toLocaleString() + " CFU/g";
+
+      const subBact = document.getElementById('kpi-bact-sub');
 
       // Alerta dinámica
       const alertBox = document.getElementById('alert-box');
       if (cfuFinal >= nCrit) {
-        alertBox.className = "p-4 rounded-xl mb-6 border bg-red-50 border-red-300 text-red-900";
+        const exceso = ((cfuFinal - nCrit) / nCrit * 100).toFixed(0);
+        subBact.className = "text-xs font-bold text-rose-600 mt-0.5";
+        subBact.innerText = `+${exceso}% sobre límite`;
+
+        alertBox.className = "p-5 rounded-2xl mb-6 shadow-sm border bg-rose-50 border-rose-300 text-rose-950";
         alertBox.innerHTML = `
-          <div class="flex items-start gap-3">
-            <span class="text-2xl">🚨</span>
+          <div class="flex items-start gap-4">
+            <span class="text-3xl">🚨</span>
             <div>
-              <h4 class="font-extrabold text-red-800 text-base">ALERTA SANITARIA: El producto supera el límite seguro de INVIMA</h4>
-              <p class="text-sm text-red-700 mt-0.5">
-                La carga final de <strong>${cfuFinal.toLocaleString(undefined, {maximumFractionDigits: 1})} CFU/g</strong> supera el límite normativo de <strong>1,000 CFU/g</strong>. 
-                Riesgo elevado de salmonelosis. El lote debe ser decomisado inmediatamente.
+              <h4 class="font-black text-rose-900 text-lg">ALERTA SANITARIA: El producto supera el límite seguro de INVIMA</h4>
+              <p class="text-sm text-rose-800 mt-1 leading-relaxed">
+                La carne ha alcanzado <strong>${cfuFinal.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong>, 
+                superando por <strong>+${exceso}%</strong> el límite legal de <strong>1,000 CFU/g</strong> (Resolución 2674/2013).
               </p>
+              <div class="mt-2.5 flex flex-wrap gap-2 text-xs font-semibold">
+                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⚠️ Riesgo Crítico de Salmonelosis</span>
+                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⛔ Lote No Apto para Consumo</span>
+              </div>
             </div>
           </div>
         `;
       } else {
         const margen = ((nCrit - cfuFinal) / nCrit * 100).toFixed(1);
-        alertBox.className = "p-4 rounded-xl mb-6 border bg-emerald-50 border-emerald-300 text-emerald-900";
+        subBact.className = "text-xs font-bold text-sky-600 mt-0.5";
+        subBact.innerText = `${margen}% margen seguro`;
+
+        alertBox.className = "p-5 rounded-2xl mb-6 shadow-sm border bg-emerald-50 border-emerald-300 text-emerald-950";
         alertBox.innerHTML = `
-          <div class="flex items-start gap-3">
-            <span class="text-2xl">✅</span>
+          <div class="flex items-start gap-4">
+            <span class="text-3xl">✅</span>
             <div>
-              <h4 class="font-extrabold text-emerald-800 text-base">PRODUCTO SEGURO</h4>
-              <p class="text-sm text-emerald-700 mt-0.5">
-                La carne mantiene condiciones de inocuidad microbiológica acorde con la <strong>Resolución INVIMA 2674/2013</strong> 
-                (Carga: <strong>${cfuFinal.toLocaleString(undefined, {maximumFractionDigits: 1})} CFU/g</strong> &lt; 1,000 CFU/g). 
-                Margen de seguridad: <strong>${margen}%</strong>.
+              <h4 class="font-black text-emerald-900 text-lg">PRODUCTO SEGURO</h4>
+              <p class="text-sm text-emerald-800 mt-1 leading-relaxed">
+                La carga final de <strong>${cfuFinal.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong> 
+                se mantiene dentro del umbral legal de la <strong>Resolución INVIMA 2674/2013</strong> (&lt; 1,000 CFU/g).
               </p>
+              <div class="mt-2.5 flex flex-wrap gap-2 text-xs font-semibold">
+                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">🛡️ Cadena de frío preservada</span>
+                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">Margen restante: ${margen}%</span>
+              </div>
             </div>
           </div>
         `;
@@ -322,64 +384,91 @@ streamlit run app.py</pre>
         y: data.temps,
         mode: 'lines',
         name: 'Temp. Carne',
-        line: { color: '#f97316', width: 3 }
+        line: { color: '#f97316', width: 3.5 }
       };
 
       const layoutTemp = {
         margin: { l: 45, r: 20, t: 20, b: 40 },
-        xaxis: { title: 'Tiempo de viaje (h)' },
-        yaxis: { title: 'Temperatura (°C)' },
-        shapes: [{
-          type: 'line',
-          x0: 0,
-          x1: tViaje,
-          y0: tAmb,
-          y1: tAmb,
-          line: { color: '#94a3b8', width: 1.5, dash: 'dot' }
-        }],
-        annotations: [{
-          x: tViaje,
-          y: tAmb,
-          xref: 'x',
-          yref: 'y',
-          text: `Ambiente (${tAmb}°C)`,
-          showarrow: false,
-          xanchor: 'right',
-          yanchor: 'bottom',
-          font: { size: 11, color: '#64748b' }
-        }]
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(240, 249, 255, 0.6)',
+        xaxis: { title: 'Tiempo de viaje (h)', gridcolor: '#e0f2fe' },
+        yaxis: { title: 'Temperatura (°C)', gridcolor: '#e0f2fe' },
+        shapes: [
+          {
+            type: 'rect',
+            x0: 0,
+            x1: tViaje,
+            y0: 0,
+            y1: 7,
+            fillcolor: 'rgba(2, 132, 199, 0.08)',
+            line: { width: 0 }
+          },
+          {
+            type: 'line',
+            x0: 0,
+            x1: tViaje,
+            y0: tAmb,
+            y1: tAmb,
+            line: { color: '#64748b', width: 1.5, dash: 'dot' }
+          }
+        ],
+        annotations: [
+          {
+            x: 0,
+            y: 6.5,
+            xref: 'x',
+            yref: 'y',
+            text: 'Zona Segura (<7°C)',
+            showarrow: false,
+            xanchor: 'left',
+            font: { size: 10, color: '#0369a1' }
+          },
+          {
+            x: tViaje,
+            y: tAmb,
+            xref: 'x',
+            yref: 'y',
+            text: `Ambiente (${tAmb}°C)`,
+            showarrow: false,
+            xanchor: 'right',
+            yanchor: 'bottom',
+            font: { size: 11, color: '#64748b' }
+          }
+        ]
       };
 
       Plotly.react('plot-temp', [traceTemp], layoutTemp, { responsive: true, displayModeBar: false });
 
       // Gráfica 2: Crecimiento bacteriano
-      const colorBact = cfuFinal >= nCrit ? '#dc2626' : '#16a34a';
+      const colorBact = cfuFinal >= nCrit ? '#dc2626' : '#0284c7';
       const traceBact = {
         x: data.tiempos,
         y: data.bacterias,
         mode: 'lines',
         name: 'Salmonella spp.',
-        line: { color: colorBact, width: 3 }
+        line: { color: colorBact, width: 3.5 }
       };
 
       const layoutBact = {
         margin: { l: 55, r: 20, t: 20, b: 40 },
-        xaxis: { title: 'Tiempo de viaje (h)' },
-        yaxis: { title: 'Carga Bacteriana (CFU/g)' },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(240, 249, 255, 0.6)',
+        xaxis: { title: 'Tiempo de viaje (h)', gridcolor: '#e0f2fe' },
+        yaxis: { title: 'Carga Bacteriana (CFU/g)', gridcolor: '#e0f2fe' },
         shapes: [{
           type: 'line',
           x0: 0,
           x1: tViaje,
           y0: nCrit,
           y1: nCrit,
-          line: { color: '#dc2626', width: 2, dash: 'dash' }
+          line: { color: '#dc2626', width: 2.5, dash: 'dash' }
         }],
         annotations: [{
           x: 0,
           y: nCrit,
           xref: 'x',
           yref: 'y',
-          text: 'Límite INVIMA 2674 (1,000 CFU/g)',
+          text: 'Límite Legal INVIMA (1,000 CFU/g)',
           showarrow: false,
           xanchor: 'left',
           yanchor: 'bottom',

@@ -8,12 +8,33 @@ import plotly.graph_objects as go
 # ==============================================================================
 st.set_page_config(
     page_title="FoodShield - Simulación de Cadena de Frío",
-    page_icon="🍗",
+    page_icon="❄️",
     layout="wide"
 )
 
+# Estilos personalizados: Paleta Cold Chain Frost
+st.markdown("""
+<style>
+    /* Fondo y estructura estilo Cold Chain Frost */
+    .stApp {
+        background: linear-gradient(180deg, #f0f9ff 0%, #f8fafc 100%);
+    }
+    [data-testid="stSidebar"] {
+        background-color: #e0f2fe !important;
+        border-right: 1px solid #bae6fd;
+    }
+    .metric-card {
+        background-color: #ffffff;
+        border: 1px solid #e0f2fe;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 1px 3px rgba(2, 132, 199, 0.08);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ==============================================================================
-# MOTOR MATEMÁTICO Y BIOLÓGICO (BACKEND)
+# MOTOR MATEMÁTICO Y BIOLÓGICO (BACKEND CALIBRADO)
 # ==============================================================================
 
 def calcular_temperatura(t_horas, t_amb, t_0, k_min):
@@ -29,26 +50,29 @@ def calcular_temperatura(t_horas, t_amb, t_0, k_min):
 def tiempo_duplicacion_salmonella(temp):
     """
     Calcula el tiempo de generación g(T) en horas para Salmonella spp.
-    según la temperatura alcanzada (modelo térmico calibrado):
-    - T < 7°C: Crecimiento inhibido / fase de latencia prolongada (g -> inf).
-    - 7°C a 15°C: Crecimiento muy lento (g decrece de 8h a 3h).
-    - 15°C a 25°C: Crecimiento moderado (g decrece de 3h a 1.2h).
-    - 25°C a 45°C: Zona óptima de crecimiento rápido (g mínimo ~0.42h = 25 min).
-    - T > 45°C: Desnaturalización y estrés térmico (g -> inf).
+    según la temperatura alcanzada en la carne de pollo:
+    - T < 7°C: Crecimiento latente / inhibido (g -> inf).
+    - 7°C a 12°C: Activación inicial lenta (g pasa de 2.5h a 1.2h).
+    - 12°C a 20°C: Crecimiento moderado (g pasa de 1.2h a 0.6h / 36 min).
+    - 20°C a 30°C: Crecimiento acelerado (g pasa de 36 min a 19 min / 0.32h).
+    - 30°C a 45°C: Fase exponencial óptima (g alcanza ~15-18 min / 0.25h).
+    - T > 45°C: Estrés térmico letal para la bacteria.
     """
     if temp < 7.0:
         return np.inf
-    elif temp < 15.0:
-        return 8.0 - (temp - 7.0) * (5.0 / 8.0)
-    elif temp < 25.0:
-        return 3.0 - (temp - 15.0) * (1.8 / 10.0)
+    elif temp < 12.0:
+        return 2.5 - (temp - 7.0) * (1.3 / 5.0)
+    elif temp < 20.0:
+        return 1.2 - (temp - 12.0) * (0.6 / 8.0)
+    elif temp < 30.0:
+        return 0.6 - (temp - 20.0) * (0.28 / 10.0)
     elif temp <= 45.0:
-        return max(0.42, 1.2 - (temp - 25.0) * (0.78 / 12.0))
+        return max(0.25, 0.32 - (temp - 30.0) * (0.07 / 15.0))
     else:
         return np.inf
 
 
-def simular_crecimiento(t_total_horas, t_amb, t_0, k_min, n_0=10.0, pasos=200):
+def simular_crecimiento(t_total_horas, t_amb, t_0, k_min, n_0=10.0, pasos=250):
     """
     Simula dinámicamente la temperatura y la fisión binaria en el intervalo de tiempo.
     N(t) = N_0 * 2^n, donde n = sum(dt / g(T)).
@@ -77,14 +101,14 @@ def simular_crecimiento(t_total_horas, t_amb, t_0, k_min, n_0=10.0, pasos=200):
 
 
 # ==============================================================================
-# INTERFAZ DE USUARIO (STREAMLIT UI)
+# INTERFAZ DE USUARIO (STREAMLIT UI - COLD CHAIN FROST)
 # ==============================================================================
 
 # Encabezado
-st.title("🍗 FoodShield: Simulación de Cadena de Frío")
+st.title("❄️ FoodShield: Simulación de Cadena de Frío")
 st.caption(
-    "Modelo predictivo de elevación térmica y crecimiento bacteriano de Salmonella spp. "
-    "en transporte de pollo fresco en Ibagué, Tolima. (Evaluación Nivel 10° Grado)."
+    "Modelo predictivo de bioseguridad alimentaria para transporte avícola en Ibagué, Tolima. "
+    "Paleta: Cold Chain Frost • Nivel Académico: 10° Grado."
 )
 st.markdown("---")
 
@@ -113,15 +137,15 @@ t_viaje = st.sidebar.slider(
 
 # 3. Menú Desplegable de Tipo de Empaque
 opciones_empaque = {
-    "Uninsulated Crate (k = 0.03)": 0.03,
-    "Plastic Bag (k = 0.02)": 0.02,
-    "Styrofoam Box (k = 0.01)": 0.01
+    "Uninsulated Crate (k = 0.030)": 0.030,
+    "Plastic Bag (k = 0.020)": 0.020,
+    "Styrofoam Box (k = 0.010)": 0.010
 }
 empaque_sel = st.sidebar.selectbox(
-    "Tipo de Empaque:",
+    "Tipo de Empaque Térmico:",
     options=list(opciones_empaque.keys()),
     index=0,
-    help="Determina la constante de transferencia de calor k del material."
+    help="El coeficiente k representa la tasa de pérdida de frío del empaque."
 )
 k_val = opciones_empaque[empaque_sel]
 
@@ -132,12 +156,12 @@ t_0 = st.sidebar.number_input(
     max_value=15.0,
     value=4.0,
     step=0.5,
-    help="Temperatura inicial de salida del centro de beneficio (idealmente 4°C)."
+    help="Temperatura de almacenamiento previo al despacho (meta: 4°C)."
 )
 
-# Constantes fijas del problema
+# Constantes biológicas y normativas
 N_0 = 10.0         # Carga inicial (CFU/g)
-N_CRIT = 1000.0    # Umbral crítico Resolución INVIMA 2674/2013 (CFU/g)
+N_CRIT = 1000.0    # Umbral crítico legal INVIMA 2674/2013 (CFU/g)
 
 # ----------------- CÁLCULOS -----------------
 tiempos, temps, bacterias = simular_crecimiento(
@@ -153,25 +177,33 @@ cfu_final = bacterias[-1]
 
 # ----------------- MÉTRICAS RÁPIDAS (KPIS) -----------------
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("🌡️ Temp. Final Producto", f"{temp_final:.1f} °C", f"+{temp_final - t_0:.1f} °C")
-m2.metric("⏱️ Tiempo de Viaje", f"{t_viaje:.1f} h")
-m3.metric("🧫 Salmonella spp. Final", f"{cfu_final:,.0f} CFU/g")
-m4.metric("⚖️ Umbral INVIMA", f"{N_CRIT:,.0f} CFU/g")
+m1.metric("🌡️ Temp. Final", f"{temp_final:.1f} °C", f"+{temp_final - t_0:.1f} °C")
+m2.metric("⏱️ Tiempo Viaje", f"{t_viaje:.1f} h", "Sin refrigerar")
+m3.metric(
+    "🧫 Salmonella spp.", 
+    f"{cfu_final:,.0f} CFU/g", 
+    f"{cfu_final - N_0:+,.0f} CFU/g",
+    delta_color="inverse"
+)
+m4.metric("⚖️ Umbral INVIMA", f"{N_CRIT:,.0f} CFU/g", "Res. 2674/2013")
 
 # ----------------- CUADRO DE ALERTA VISUAL -----------------
 st.markdown("### 🚦 Diagnóstico Sanitario del Lote")
 if cfu_final >= N_CRIT:
+    exceso = ((cfu_final - N_CRIT) / N_CRIT) * 100
     st.error(
-        f"🚨 **ALERTA SANITARIA: El producto supera el límite seguro de INVIMA.** "
-        f"(Carga final: **{cfu_final:,.1f} CFU/g** ≥ {N_CRIT:,.0f} CFU/g). "
-        f"Riesgo crítico de salmonelosis. No apto para consumo humano."
+        f"🚨 **ALERTA SANITARIA: El producto supera el límite seguro de INVIMA.**\n\n"
+        f"- Carga final detectada: **{cfu_final:,.0f} CFU/g** (Supera el límite legal por **+{exceso:,.1f}%**).\n"
+        f"- Condición: El alimento perdió la cadena de frío, permitiendo la proliferación exponencial de patógenos.\n"
+        f"- Acción: **Lote rechazado**. Prohibida su comercialización."
     )
 else:
     margen_seguridad = ((N_CRIT - cfu_final) / N_CRIT) * 100
     st.success(
-        f"✅ **PRODUCTO SEGURO:** La carne se encuentra dentro de los estándares "
-        f"sanitarios de la Resolución INVIMA 2674/2013 "
-        f"({cfu_final:,.1f} CFU/g < {N_CRIT:,.0f} CFU/g). Margen: {margen_seguridad:.1f}%."
+        f"✅ **PRODUCTO SEGURO**\n\n"
+        f"- Carga final estimada: **{cfu_final:,.0f} CFU/g** (Por debajo del límite de {N_CRIT:,.0f} CFU/g).\n"
+        f"- Margen de inocuidad: **{margen_seguridad:.1f}%** de seguridad restante.\n"
+        f"- El empaque y tiempo de transporte mantuvieron la bacteria en rangos admisibles."
     )
 
 st.markdown("---")
@@ -188,15 +220,25 @@ with col_g1:
         y=temps,
         mode="lines",
         name="Temp. Carne",
-        line=dict(color="#f97316", width=3)
+        line=dict(color="#f97316", width=3.5)
     ))
     
+    # Línea ambiente
     fig_temp.add_hline(
         y=t_amb,
         line_dash="dot",
         line_color="#64748b",
         annotation_text=f"Ambiente ({t_amb}°C)",
         annotation_position="bottom right"
+    )
+
+    # Zona segura refrigeración
+    fig_temp.add_hrect(
+        y0=0, y1=7,
+        fillcolor="#0284c7", opacity=0.08,
+        line_width=0,
+        annotation_text="Zona de Inhibición (<7°C)",
+        annotation_position="top left"
     )
     
     fig_temp.update_layout(
@@ -205,7 +247,9 @@ with col_g1:
         template="plotly_white",
         hovermode="x unified",
         margin=dict(l=40, r=20, t=30, b=40),
-        height=380
+        height=380,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(240,249,255,0.6)"
     )
     st.plotly_chart(fig_temp, use_container_width=True)
 
@@ -213,14 +257,14 @@ with col_g2:
     st.subheader("🔬 Curva de Crecimiento: Salmonella spp. vs. Tiempo")
     fig_bact = go.Figure()
     
-    color_linea = "#dc2626" if cfu_final >= N_CRIT else "#16a34a"
+    color_linea = "#dc2626" if cfu_final >= N_CRIT else "#0284c7"
     
     fig_bact.add_trace(go.Scatter(
         x=tiempos,
         y=bacterias,
         mode="lines",
         name="CFU/g",
-        line=dict(color=color_linea, width=3)
+        line=dict(color=color_linea, width=3.5)
     ))
     
     # Línea horizontal crítica discontinua en 1,000 CFU/g
@@ -240,29 +284,24 @@ with col_g2:
         template="plotly_white",
         hovermode="x unified",
         margin=dict(l=40, r=20, t=30, b=40),
-        height=380
+        height=380,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(240,249,255,0.6)"
     )
     st.plotly_chart(fig_bact, use_container_width=True)
 
 # ----------------- FUNDAMENTO CIENTÍFICO -----------------
-with st.expander("📖 Fundamento Científico y Fórmulas Matemáticas (10° Grado)"):
+with st.expander("📖 Fundamento Científico y Validación Biológica (10° Grado)"):
     st.markdown(r"""
     ### 1. Ley de Enfriamiento/Calentamiento de Newton
     $$T(t) = T_{\text{amb}} + (T_0 - T_{\text{amb}}) \cdot e^{-kt}$$
-    - **$T_{\text{amb}}$**: Temperatura ambiente en Ibagué ($20^\circ\text{C} - 35^\circ\text{C}$).
-    - **$T_0$**: Temperatura inicial refrigerada ($4^\circ\text{C}$).
-    - **$k$**: Coeficiente de transferencia térmica según empaque:
-      - Canastilla sin aislar (*Uninsulated Crate*): $k = 0.030\text{ min}^{-1}$
-      - Bolsa plástica (*Plastic Bag*): $k = 0.020\text{ min}^{-1}$
-      - Caja de icopor (*Styrofoam Box*): $k = 0.010\text{ min}^{-1}$
+    - **$k = 0.030\text{ min}^{-1}$ (Canastilla sin aislar):** Rápida penetración de calor del clima de Ibagué.
+    - **$k = 0.020\text{ min}^{-1}$ (Bolsa plástica):** Resistencia térmica mínima.
+    - **$k = 0.010\text{ min}^{-1}$ (Caja de icopor / Styrofoam):** Retarda sustancialmente la curva térmica.
 
-    ### 2. Modelo de Fisión Binaria
-    $$N(t) = N_0 \cdot 2^n \quad \text{donde} \quad n = \frac{t}{g(T)}$$
-    - **$N_0$**: Carga inicial ($10\text{ CFU/g}$).
-    - **$g(T)$**: Tiempo de duplicación bacteriana, el cual depende dinámicamente de la temperatura del pollo:
-      - $T < 7^\circ\text{C}$: Crecimiento latente / prácticamente nulo ($g \to \infty$).
-      - $7^\circ\text{C} \le T \le 45^\circ\text{C}$: Zona de peligro alimentario donde el tiempo de duplicación decae progresivamente hasta $\approx 25\text{ minutos}$ en condiciones óptimas.
-
-    ### 3. Marco Normativo Colombiano
-    - **Resolución INVIMA 2674 de 2013**: Fija condiciones higiénico-sanitarias y umbrales microbiológicos estrictos ($N_{\text{crit}} = 1,000\text{ CFU/g}$) para la protección de la salud pública.
+    ### 2. Modelo de Fisión Binaria Calibrado
+    $$N(t) = N_0 \cdot 2^n \quad \text{donde} \quad n = \sum \frac{\Delta t}{g(T)}$$
+    - Por debajo de $7^\circ\text{C}$, el metabolismo de *Salmonella* está latente ($g \to \infty$).
+    - Al subir la temperatura hacia $28^\circ\text{C}-35^\circ\text{C}$, el tiempo de duplicación $g(T)$ desciende drásticamente hasta $\approx 15-20\text{ minutos}$ en carne de pollo rica en sustrato.
+    - **Resultado observable:** Un viaje superior a 2.5 - 3 horas sin empaque aislante en Ibagué supera con creces el límite de $1,000\text{ CFU/g}$, detonando la **Alerta Sanitaria**.
     """)
