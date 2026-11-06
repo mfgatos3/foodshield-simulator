@@ -1,70 +1,71 @@
-# 🍗 FoodShield: Simulador de Cadena de Frío e Inocuidad Alimentaria
+# ❄️ FoodShield: Cold Chain & Food Safety Simulator
 
-> Prototipo interactivo desarrollado para la plataforma **FoodShield** (evaluación de nivel 10° grado).
+> Interactive research prototype developed for the **FoodShield** platform (Grade 10 Academic Deliverable).
 
-Simula la elevación de temperatura en carne de pollo fresca transportada sin refrigeración activa en el clima de **Ibagué, Tolima**, y calcula el crecimiento bacteriano de ***Salmonella spp.*** bajo la normativa colombiana (**Resolución INVIMA 2674 de 2013**).
+Simulates temperature rise in fresh poultry meat transported without active refrigeration in the tropical climate of **Ibagué, Tolima**, and calculates bacterial proliferation of ***Salmonella spp.*** according to Colombian sanitary regulations (**INVIMA Resolution 2674 of 2013**).
 
-🌐 **Demo en vivo en GitHub Pages:** [https://mfgatos3.github.io/foodshield-simulator/](https://mfgatos3.github.io/foodshield-simulator/)
+🌐 **Live Web Application on GitHub Pages:** [https://mfgatos3.github.io/foodshield-simulator/](https://mfgatos3.github.io/foodshield-simulator/)
 
 ---
 
-## 🚀 Características y Arquitectura
+## 🚀 Key Features & Architecture
 
-1. **Panel de Control (Sidebar):**
-   - **Temperatura Ambiente ($T_{\text{amb}}$):** Rango de 20°C a 35°C (predeterminado: 28°C).
-   - **Tiempo de Trayecto ($t$):** Rango de 0.5 a 4.0 horas (pasos de 0.5 h).
-   - **Tipo de Empaque:**
-     - *Uninsulated Crate* ($k = 0.03\text{ min}^{-1}$)
-     - *Plastic Bag* ($k = 0.02\text{ min}^{-1}$)
-     - *Styrofoam Box* ($k = 0.01\text{ min}^{-1}$)
-   - **Temperatura Inicial de la Carne ($T_0$):** 4°C.
+1. **Interactive Control Panel (Sidebar):**
+   - **Ambient Temperature ($T_{\text{amb}}$):** 20°C to 35°C (default: 28°C).
+   - **Travel Time ($t$):** 0.5 to 4.0 hours (0.5h step).
+   - **Thermal Packaging Options:**
+     - *Uninsulated Crate* ($k = 0.030\text{ min}^{-1}$)
+     - *Plastic Bag* ($k = 0.020\text{ min}^{-1}$)
+     - *Styrofoam Box* ($k = 0.010\text{ min}^{-1}$)
+   - **Initial Meat Temperature ($T_0$):** 4°C.
 
-2. **Modelación Matemática y Biológica (Backend):**
-   - **Ley de Enfriamiento/Calentamiento de Newton:**
+2. **Mathematical & Biological Backend:**
+   - **Newton's Law of Cooling/Heating:**
      $$T(t) = T_{\text{amb}} + (T_0 - T_{\text{amb}}) \cdot e^{-kt}$$
-   - **Modelo de Fisión Binaria Bacteriana:**
-     $$N(t) = N_0 \cdot 2^n \quad \text{donde} \quad n = \sum \frac{\Delta t}{g(T)}$$
-   - **Carga bacteriana inicial ($N_0$):** $10\text{ CFU/g}$.
-   - **Umbral crítico normativo ($N_{\text{crit}}$):** $1,000\text{ CFU/g}$ (Resolución INVIMA 2674/2013).
+   - **Dynamic Binary Fission Growth:**
+     $$N(t) = N_0 \cdot 2^n \quad \text{where} \quad n = \sum \frac{\Delta t}{g(T)}$$
+   - **Initial Bacterial Load ($N_0$):** $10\text{ CFU/g}$.
+   - **Legal Critical Safety Limit ($N_{\text{crit}}$):** $1,000\text{ CFU/g}$ (INVIMA Res. 2674/2013).
 
-3. **Resultados Visuales:**
-   - **Gráfica 1:** Curva térmica del producto vs. tiempo con referencia a la temperatura ambiente.
-   - **Gráfica 2:** Curva de crecimiento de *Salmonella spp.* vs. tiempo con línea roja discontinua en $1,000\text{ CFU/g}$.
-   - **Alerta Sanitaria:**
-     - 🚨 **Rojo:** `ALERTA SANITARIA: El producto supera el límite seguro de INVIMA` ($N(t) \ge 1,000$).
-     - ✅ **Verde:** `PRODUCTO SEGURO` ($N(t) < 1,000$).
+3. **Visual Outputs & Dashboard:**
+   - **Chart 1:** Thermal curve of meat temperature vs. transit time, highlighting the safe refrigeration zone ($<7^\circ\text{C}$).
+   - **Chart 2:** Bacterial growth curve with a dashed red line at $1,000\text{ CFU/g}$.
+   - **Sanitary Diagnosis Alert:**
+     - 🚨 **Red Alert:** `SANITARY ALERT: Product exceeds the safe INVIMA threshold` ($N(t) \ge 1,000$).
+     - ✅ **Green Badge:** `SAFE PRODUCT` ($N(t) < 1,000$).
+   - **Integrated Academic Argumentative Essay:** Complete 5-section formal policy and biothermal research paper on public health, distributive justice, and low-cost cold-chain interventions in Comuna 8 of Ibagué.
 
 ---
 
-## 💻 Ejecución Local con Streamlit (Python)
+## 💻 Local Execution with Python (Streamlit)
 
-Si deseas ejecutar la aplicación nativa en tu entorno local de Python:
+To run the native Python application on your local machine:
 
 ```bash
-# 1. Clonar el repositorio
+# 1. Clone the repository
 git clone https://github.com/mfgatos3/foodshield-simulator.git
 cd foodshield-simulator
 
-# 2. Instalar dependencias
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Iniciar la aplicación Streamlit
+# 3. Launch Streamlit
 streamlit run app.py
 ```
 
 ---
 
-## 📁 Estructura del Repositorio
+## 📁 Repository Structure
 
 ```
 foodshield-simulator/
-├── app.py              # Aplicación nativa en Python con Streamlit y Plotly
-├── requirements.txt    # Dependencias de Python (streamlit, numpy, pandas, plotly)
-├── index.html          # Interfaz web interactiva desplegada en GitHub Pages
-└── README.md           # Documentación del proyecto
+├── app.py              # Native Python Streamlit application with Plotly
+├── requirements.txt    # Python dependencies (streamlit, numpy, pandas, plotly)
+├── index.html          # Interactive client application deployed on GitHub Pages
+└── README.md           # Project documentation and research report
 ```
 
 ---
 
-## 📜 Normativa y Referencias
-- **Ministerio de Salud y Protección Social / INVIMA:** *Resolución 2674 de 2013* - Requisitos sanitarios que se deben cumplir para la fabricación, procesamiento, preparación, envase, almacenamiento, transporte, distribución y comercialización de alimentos en Colombia.
+## 📜 Regulatory Standards & Citations
+- **Ministry of Health and Social Protection / INVIMA:** *Resolution 2674 of 2013* - Sanitary requirements for the manufacturing, processing, packaging, storage, transportation, distribution, and commercialization of food products in Colombia.

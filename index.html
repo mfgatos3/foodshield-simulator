@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FoodShield - Simulación de Cadena de Frío</title>
+  <title>FoodShield - Cold Chain Simulation</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
-    /* Paleta: Cold Chain Frost (Cadena de Frío & Hielo) */
+    /* Palette: Cold Chain Frost */
     :root {
       --frost-bg: #f0f9ff;
       --frost-card: #ffffff;
@@ -47,7 +47,7 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col md:flex-row">
 
-  <!-- SIDEBAR LATERAL FROST -->
+  <!-- FROST SIDEBAR -->
   <aside class="w-full md:w-80 lg:w-96 st-sidebar p-6 flex-shrink-0 flex flex-col justify-between shadow-sm">
     <div>
       <div class="flex items-center gap-3 mb-6">
@@ -59,149 +59,149 @@
             <h1 class="text-xl font-black tracking-tight text-sky-950">FoodShield</h1>
             <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-200 text-sky-800">FROST</span>
           </div>
-          <p class="text-xs text-sky-700 font-medium">Ibagué • Nivel 10° Grado</p>
+          <p class="text-xs text-sky-700 font-medium">Ibagué • Grade 10 Level</p>
         </div>
       </div>
 
       <div class="border-t border-sky-300 pt-4 mb-5">
         <h2 class="text-xs uppercase tracking-wider font-bold text-sky-800 mb-4 flex items-center gap-2">
-          ⚙️ Parámetros de Simulación
+          ⚙️ Simulation Parameters
         </h2>
 
-        <!-- 1. Deslizador Tamb -->
+        <!-- 1. Ambient Temperature Slider -->
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
-            <label class="font-semibold text-sky-950">Temp. Ambiente (<span class="italic">T</span><sub>amb</sub>):</label>
+            <label class="font-semibold text-sky-950">Ambient Temp. (<span class="italic">T</span><sub>amb</sub>):</label>
             <span id="label-tamb" class="font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200 text-xs">28.0 °C</span>
           </div>
           <input id="input-tamb" type="range" min="20" max="35" step="0.5" value="28.0" 
                  class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
           <div class="flex justify-between text-[10px] text-sky-600 mt-1 font-medium">
-            <span>20°C (Templado)</span>
-            <span>35°C (Calor Extremo)</span>
+            <span>20°C (Mild)</span>
+            <span>35°C (Extreme Heat)</span>
           </div>
         </div>
 
-        <!-- 2. Deslizador Tiempo -->
+        <!-- 2. Travel Time Slider -->
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
-            <label class="font-semibold text-sky-950">Tiempo Trayecto (<span class="italic">t</span>):</label>
+            <label class="font-semibold text-sky-950">Travel Time (<span class="italic">t</span>):</label>
             <span id="label-tviaje" class="font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 text-xs">2.0 h</span>
           </div>
           <input id="input-tviaje" type="range" min="0.5" max="4.0" step="0.5" value="2.0" 
                  class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
           <div class="flex justify-between text-[10px] text-sky-600 mt-1 font-medium">
-            <span>0.5h (Rápido)</span>
-            <span>4.0h (Retraso Severo)</span>
+            <span>0.5h (Quick)</span>
+            <span>4.0h (Severe Delay)</span>
           </div>
         </div>
 
-        <!-- 3. Tipo de Empaque -->
+        <!-- 3. Packaging Type Selectbox -->
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
-          <label class="block text-sm font-semibold text-sky-950 mb-1.5">Tipo de Empaque Térmico:</label>
+          <label class="block text-sm font-semibold text-sky-950 mb-1.5">Thermal Packaging Type:</label>
           <select id="select-empaque" class="w-full bg-white border border-sky-300 text-slate-800 text-sm rounded-lg p-2.5 font-medium focus:ring-sky-500 focus:border-sky-500 shadow-sm">
             <option value="0.03" selected>📦 Uninsulated Crate (k = 0.03)</option>
             <option value="0.02">🛍️ Plastic Bag (k = 0.02)</option>
             <option value="0.01">🧊 Styrofoam Box (k = 0.01)</option>
           </select>
           <p class="text-[11px] text-sky-700 mt-1.5 leading-snug">
-            <em>k = 0.01 (Icopor)</em> aísla 3 veces más que la canastilla abierta.
+            <em>k = 0.01 (Styrofoam)</em> insulates 3 times better than an open crate.
           </p>
         </div>
 
-        <!-- 4. Temp Inicial -->
+        <!-- 4. Initial Meat Temperature -->
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
-            <label class="font-semibold text-sky-950">Temp. Inicial (<span class="italic">T</span><sub>0</sub>):</label>
-            <span class="text-xs font-bold text-sky-800">Refrigerado</span>
+            <label class="font-semibold text-sky-950">Initial Meat Temp. (<span class="italic">T</span><sub>0</sub>):</label>
+            <span class="text-xs font-bold text-sky-800">Refrigerated</span>
           </div>
           <input id="input-t0" type="number" step="0.5" min="0" max="15" value="4.0" 
                  class="w-full bg-white border border-sky-300 text-slate-800 text-sm rounded-lg p-2 font-medium focus:ring-sky-500 focus:border-sky-500 shadow-sm">
-          <p class="text-[11px] text-sky-700 mt-1">Salida de planta a 4.0 °C.</p>
+          <p class="text-[11px] text-sky-700 mt-1">Dispatched from facility at 4.0 °C.</p>
         </div>
       </div>
     </div>
 
-    <!-- Metadata inferior -->
+    <!-- Bottom Sidebar Metadata -->
     <div class="pt-4 border-t border-sky-300 text-xs text-sky-800 space-y-1">
       <div class="flex justify-between">
-        <span>Carga Inicial (N<sub>0</sub>):</span>
+        <span>Initial Bacterial Load (N<sub>0</sub>):</span>
         <span class="font-bold">10 CFU/g</span>
       </div>
       <div class="flex justify-between">
-        <span>Límite Legal INVIMA:</span>
+        <span>INVIMA Legal Threshold:</span>
         <span class="font-bold text-red-600">1,000 CFU/g</span>
       </div>
-      <p class="pt-2 text-[11px] text-sky-600 border-t border-sky-200">Resolución 2674/2013 Colombia</p>
+      <p class="pt-2 text-[11px] text-sky-600 border-t border-sky-200">Resolution 2674/2013 Colombia</p>
     </div>
   </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- MAIN DASHBOARD CONTENT -->
   <main class="flex-1 p-6 md:p-8 lg:p-10 overflow-y-auto">
     <!-- Header -->
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-2xl md:text-3xl font-black text-sky-950 tracking-tight">
-            Monitoreo Térmico & Crecimiento de <span class="italic text-sky-600">Salmonella spp.</span>
+            Thermal Monitoring & Growth of <span class="italic text-sky-600">Salmonella spp.</span>
           </h1>
         </div>
         <p class="text-sm text-slate-600 mt-1">
-          Simulador de bioseguridad alimentaria para transporte avícola en el clima cálido de Ibagué, Tolima.
+          Biosecurity food safety simulator for poultry transport in the warm climate of Ibagué, Tolima.
         </p>
       </div>
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200 shadow-sm">
-        <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span> Modelo Calibrado
+        <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span> Calibrated Model
       </span>
     </div>
 
-    <!-- TARJETAS DE MÉTRICAS (KPIS) -->
+    <!-- KPI METRIC CARDS -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
-        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🌡️ Temp. Final</div>
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🌡️ Final Temp</div>
         <div id="kpi-temp" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- °C</div>
         <div id="kpi-temp-delta" class="text-xs font-semibold text-orange-600 mt-0.5">--</div>
       </div>
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
-        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⏱️ Duración Viaje</div>
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⏱️ Travel Duration</div>
         <div id="kpi-tiempo" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- h</div>
-        <div class="text-xs font-medium text-slate-400 mt-0.5">Sin refrigerador</div>
+        <div class="text-xs font-medium text-slate-400 mt-0.5">Without refrigeration</div>
       </div>
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
-        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🧫 Carga Final</div>
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🧫 Final Bacterial Load</div>
         <div id="kpi-bact" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- CFU/g</div>
         <div id="kpi-bact-sub" class="text-xs font-semibold mt-0.5">--</div>
       </div>
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
-        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⚖️ Límite Legal</div>
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⚖️ Legal Threshold</div>
         <div class="text-2xl lg:text-3xl font-black text-rose-700 mt-1">1,000 CFU/g</div>
         <div class="text-xs font-medium text-slate-400 mt-0.5">INVIMA Res. 2674</div>
       </div>
     </div>
 
-    <!-- CUADRO DE ALERTA DINÁMICO -->
+    <!-- DYNAMIC SANITARY ALERT BOX -->
     <div id="alert-box" class="p-5 rounded-2xl mb-6 shadow-sm border transition-all duration-300">
-      <!-- Inyectado dinámicamente -->
+      <!-- Dynamically injected via JS -->
     </div>
 
-    <!-- GRÁFICAS (2 COLUMNAS) -->
+    <!-- CHARTS (2 COLUMNS) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <!-- Gráfica 1 -->
+      <!-- Chart 1: Temperature -->
       <div class="glass-card p-5 rounded-2xl shadow-sm border border-sky-100">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-sm font-bold text-sky-950 uppercase tracking-wide flex items-center gap-2">
-            📈 Curva Térmica: Temperatura vs. Tiempo
+            📈 Thermal Curve: Temperature vs. Time
           </h3>
           <span class="text-xs text-slate-400 font-mono">T(t)</span>
         </div>
         <div id="plot-temp" class="w-full h-80"></div>
       </div>
 
-      <!-- Gráfica 2 -->
+      <!-- Chart 2: Salmonella Growth -->
       <div class="glass-card p-5 rounded-2xl shadow-sm border border-sky-100">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-sm font-bold text-sky-950 uppercase tracking-wide flex items-center gap-2">
-            🔬 Crecimiento de Salmonella spp. vs. Tiempo
+            🔬 Salmonella spp. Growth vs. Time
           </h3>
           <span class="text-xs text-slate-400 font-mono">N(t)</span>
         </div>
@@ -209,31 +209,31 @@
       </div>
     </div>
 
-    <!-- SECCIÓN ACORDEÓN: FUNDAMENTO CIENTÍFICO Y VALIDACIÓN -->
+    <!-- SCIENTIFIC FOUNDATION & BIOLOGICAL VALIDATION -->
     <div class="glass-card rounded-2xl shadow-sm border border-sky-100 p-6 mb-8">
       <h3 class="text-base font-bold text-sky-950 mb-4 flex items-center gap-2">
-        📚 Fundamento Científico y Validación Biológica (10° Grado)
+        📚 Scientific Foundation & Biological Validation (Grade 10)
       </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700">
         <div class="space-y-3">
-          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">1. Ley de Calentamiento de Newton</h4>
+          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">1. Newton's Law of Cooling/Heating</h4>
           <div class="p-3 bg-sky-50/50 rounded-xl text-center font-serif text-base border border-sky-200">
             $$T(t) = T_{\text{amb}} + (T_0 - T_{\text{amb}}) \cdot e^{-kt}$$
           </div>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Modela la transferencia de calor convectivo entre el aire de Ibagué y la masa del pollo. 
-            El icopor (<em>Styrofoam</em>, $k = 0.010$) retarda el calentamiento significativamente en comparación con la canastilla abierta ($k = 0.030$).
+            Models convective heat transfer between ambient air in Ibagué and poultry meat mass. 
+            Styrofoam (<em>Styrofoam Box</em>, $k = 0.010$) significantly delays thermal elevation compared to an uninsulated open crate ($k = 0.030$).
           </p>
         </div>
 
         <div class="space-y-3">
-          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">2. Modelo de Fisión Binaria Dinámica</h4>
+          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">2. Dynamic Binary Fission Model</h4>
           <div class="p-3 bg-sky-50/50 rounded-xl text-center font-serif text-base border border-sky-200">
-            $$N(t) = N_0 \cdot 2^n \quad \text{donde} \quad n = \sum \frac{\Delta t}{g(T)}$$
+            $$N(t) = N_0 \cdot 2^n \quad \text{where} \quad n = \sum \frac{\Delta t}{g(T)}$$
           </div>
           <p class="text-xs text-slate-600 leading-relaxed">
-            El tiempo de duplicación $g(T)$ decrece con el calor: por debajo de $7^\circ\text{C}$ la bacteria está inactiva; pero a temperaturas superiores a $25^\circ\text{C}-35^\circ\text{C}$, se divide cada <strong>15 a 20 minutos</strong>, disparando el crecimiento exponencial.
+            Doubling time $g(T)$ decreases rapidly with heat: below $7^\circ\text{C}$ bacteria remain dormant; but at temperatures between $25^\circ\text{C}-35^\circ\text{C}$, cells divide every <strong>15 to 20 minutes</strong>, triggering rapid exponential proliferation.
           </p>
         </div>
       </div>
@@ -313,15 +313,15 @@
       </div>
     </div>
 
-    <!-- EJECUCIÓN CON STREAMLIT (INFO) -->
+    <!-- LOCAL PYTHON STREAMLIT INSTRUCTIONS -->
     <div class="bg-sky-950 text-sky-100 rounded-2xl p-5 shadow-sm text-xs md:text-sm border border-sky-900">
       <div class="flex items-center justify-between mb-2">
         <span class="font-mono text-sky-300 font-bold flex items-center gap-2">
-          🐍 Código Streamlit nativo disponible en el repositorio (app.py)
+          🐍 Native Streamlit Python script available in repository (app.py)
         </span>
       </div>
       <p class="text-sky-300 mb-2 text-xs">
-        Para ejecutar la aplicación nativa de Python localmente con Streamlit:
+        To execute the native Python application locally with Streamlit:
       </p>
       <pre class="bg-black/40 p-3 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto border border-sky-800">git clone https://github.com/mfgatos3/foodshield-simulator.git
 cd foodshield-simulator
@@ -330,134 +330,134 @@ streamlit run app.py</pre>
     </div>
   </main>
 
-  <!-- MOTOR JAVASCRIPT DE SIMULACIÓN Y RENDERIZADO -->
+  <!-- JAVASCRIPT SIMULATION AND RENDERING ENGINE -->
   <script>
-    // Ley de Newton
-    function calcularTemperatura(tHoras, tAmb, t0, kMin) {
-      const tMin = tHoras * 60.0;
+    // Newton's Law of Cooling/Heating
+    function calculateTemperature(tHours, tAmb, t0, kMin) {
+      const tMin = tHours * 60.0;
       return tAmb + (t0 - tAmb) * Math.exp(-kMin * tMin);
     }
 
-    // Tiempo de generación calibrado para Salmonella spp. en carne fresca de pollo
-    function tiempoDuplicacion(temp) {
-      if (temp < 7.0) return Infinity; // Latencia / frío seguro
+    // Calibrated doubling time for Salmonella spp. in fresh poultry meat
+    function doublingTime(temp) {
+      if (temp < 7.0) return Infinity; // Dormancy / safe cold storage
       if (temp < 12.0) return 2.5 - (temp - 7.0) * (1.3 / 5.0); // 2.5h -> 1.2h
       if (temp < 20.0) return 1.2 - (temp - 12.0) * (0.6 / 8.0); // 1.2h -> 0.6h (36 min)
       if (temp < 30.0) return 0.6 - (temp - 20.0) * (0.28 / 10.0); // 36 min -> 19 min (0.32h)
       if (temp <= 45.0) return Math.max(0.25, 0.32 - (temp - 30.0) * (0.07 / 15.0)); // 19 min -> 15 min (0.25h)
-      return Infinity; // Estrés térmico letal >45°C
+      return Infinity; // Thermal stress / inactivation above 45°C
     }
 
-    function simular(tViaje, tAmb, t0, kMin, n0 = 10.0, pasos = 250) {
-      const tiempos = [];
+    function simulate(tTravel, tAmb, t0, kMin, n0 = 10.0, steps = 250) {
+      const times = [];
       const temps = [];
-      const bacterias = [];
-      const dt = tViaje / (pasos - 1);
+      const bacteria = [];
+      const dt = tTravel / (steps - 1);
 
-      let nAcumulado = 0.0;
+      let nCumulative = 0.0;
 
-      for (let i = 0; i < pasos; i++) {
+      for (let i = 0; i < steps; i++) {
         const t = i * dt;
-        tiempos.push(t);
+        times.push(t);
 
-        const temp = calcularTemperatura(t, tAmb, t0, kMin);
+        const temp = calculateTemperature(t, tAmb, t0, kMin);
         temps.push(temp);
 
         if (i === 0) {
-          bacterias.push(n0);
+          bacteria.push(n0);
         } else {
-          const g = tiempoDuplicacion(temp);
+          const g = doublingTime(temp);
           if (isFinite(g) && g > 0) {
-            nAcumulado += dt / g;
+            nCumulative += dt / g;
           }
-          const pop = n0 * Math.pow(2.0, nAcumulado);
-          bacterias.push(pop);
+          const pop = n0 * Math.pow(2.0, nCumulative);
+          bacteria.push(pop);
         }
       }
 
-      return { tiempos, temps, bacterias };
+      return { times, temps, bacteria };
     }
 
-    function actualizarDashboard() {
+    function updateDashboard() {
       const tAmb = parseFloat(document.getElementById('input-tamb').value);
-      const tViaje = parseFloat(document.getElementById('input-tviaje').value);
+      const tTravel = parseFloat(document.getElementById('input-tviaje').value);
       const kVal = parseFloat(document.getElementById('select-empaque').value);
       const t0 = parseFloat(document.getElementById('input-t0').value) || 4.0;
       const nCrit = 1000.0;
       const n0 = 10.0;
 
-      // Actualizar etiquetas
+      // Update input display labels
       document.getElementById('label-tamb').innerText = tAmb.toFixed(1) + " °C";
-      document.getElementById('label-tviaje').innerText = tViaje.toFixed(1) + " h";
+      document.getElementById('label-tviaje').innerText = tTravel.toFixed(1) + " h";
 
-      // Ejecutar simulación
-      const data = simular(tViaje, tAmb, t0, kVal, n0);
-      const tempFinal = data.temps[data.temps.length - 1];
-      const cfuFinal = data.bacterias[data.bacterias.length - 1];
+      // Run simulation
+      const data = simulate(tTravel, tAmb, t0, kVal, n0);
+      const finalTemp = data.temps[data.temps.length - 1];
+      const finalCfu = data.bacteria[data.bacteria.length - 1];
 
-      // Actualizar KPIs
-      document.getElementById('kpi-temp').innerText = tempFinal.toFixed(1) + " °C";
-      const deltaT = tempFinal - t0;
-      document.getElementById('kpi-temp-delta').innerText = (deltaT >= 0 ? "+" : "") + deltaT.toFixed(1) + " °C vs salida";
-      document.getElementById('kpi-tiempo').innerText = tViaje.toFixed(1) + " h";
-      document.getElementById('kpi-bact').innerText = Math.round(cfuFinal).toLocaleString() + " CFU/g";
+      // Update KPI Cards
+      document.getElementById('kpi-temp').innerText = finalTemp.toFixed(1) + " °C";
+      const deltaT = finalTemp - t0;
+      document.getElementById('kpi-temp-delta').innerText = (deltaT >= 0 ? "+" : "") + deltaT.toFixed(1) + " °C vs dispatch";
+      document.getElementById('kpi-tiempo').innerText = tTravel.toFixed(1) + " h";
+      document.getElementById('kpi-bact').innerText = Math.round(finalCfu).toLocaleString() + " CFU/g";
 
       const subBact = document.getElementById('kpi-bact-sub');
 
-      // Alerta dinámica
+      // Dynamic Alert Box
       const alertBox = document.getElementById('alert-box');
-      if (cfuFinal >= nCrit) {
-        const exceso = ((cfuFinal - nCrit) / nCrit * 100).toFixed(0);
+      if (finalCfu >= nCrit) {
+        const excess = ((finalCfu - nCrit) / nCrit * 100).toFixed(0);
         subBact.className = "text-xs font-bold text-rose-600 mt-0.5";
-        subBact.innerText = `+${exceso}% sobre límite`;
+        subBact.innerText = `+${excess}% above threshold`;
 
         alertBox.className = "p-5 rounded-2xl mb-6 shadow-sm border bg-rose-50 border-rose-300 text-rose-950";
         alertBox.innerHTML = `
           <div class="flex items-start gap-4">
             <span class="text-3xl">🚨</span>
             <div>
-              <h4 class="font-black text-rose-900 text-lg">ALERTA SANITARIA: El producto supera el límite seguro de INVIMA</h4>
+              <h4 class="font-black text-rose-900 text-lg">SANITARY ALERT: Product exceeds the safe INVIMA threshold</h4>
               <p class="text-sm text-rose-800 mt-1 leading-relaxed">
-                La carne ha alcanzado <strong>${cfuFinal.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong>, 
-                superando por <strong>+${exceso}%</strong> el límite legal de <strong>1,000 CFU/g</strong> (Resolución 2674/2013).
+                Meat has reached <strong>${finalCfu.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong>, 
+                exceeding by <strong>+${excess}%</strong> the legal threshold of <strong>1,000 CFU/g</strong> (Resolution 2674/2013).
               </p>
               <div class="mt-2.5 flex flex-wrap gap-2 text-xs font-semibold">
-                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⚠️ Riesgo Crítico de Salmonelosis</span>
-                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⛔ Lote No Apto para Consumo</span>
+                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⚠️ Critical Salmonellosis Risk</span>
+                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⛔ Lot Unfit for Human Consumption</span>
               </div>
             </div>
           </div>
         `;
       } else {
-        const margen = ((nCrit - cfuFinal) / nCrit * 100).toFixed(1);
+        const margin = ((nCrit - finalCfu) / nCrit * 100).toFixed(1);
         subBact.className = "text-xs font-bold text-sky-600 mt-0.5";
-        subBact.innerText = `${margen}% margen seguro`;
+        subBact.innerText = `${margin}% safety margin`;
 
         alertBox.className = "p-5 rounded-2xl mb-6 shadow-sm border bg-emerald-50 border-emerald-300 text-emerald-950";
         alertBox.innerHTML = `
           <div class="flex items-start gap-4">
             <span class="text-3xl">✅</span>
             <div>
-              <h4 class="font-black text-emerald-900 text-lg">PRODUCTO SEGURO</h4>
+              <h4 class="font-black text-emerald-900 text-lg">SAFE PRODUCT</h4>
               <p class="text-sm text-emerald-800 mt-1 leading-relaxed">
-                La carga final de <strong>${cfuFinal.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong> 
-                se mantiene dentro del umbral legal de la <strong>Resolución INVIMA 2674/2013</strong> (&lt; 1,000 CFU/g).
+                The final bacterial load of <strong>${finalCfu.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong> 
+                remains safely within the legal limit set by <strong>INVIMA Resolution 2674/2013</strong> (&lt; 1,000 CFU/g).
               </p>
               <div class="mt-2.5 flex flex-wrap gap-2 text-xs font-semibold">
-                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">🛡️ Cadena de frío preservada</span>
-                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">Margen restante: ${margen}%</span>
+                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">🛡️ Cold chain preserved</span>
+                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">Remaining safety margin: ${margin}%</span>
               </div>
             </div>
           </div>
         `;
       }
 
-      // Gráfica 1: Temperatura
+      // Chart 1: Temperature vs Time
       const traceTemp = {
-        x: data.tiempos,
+        x: data.times,
         y: data.temps,
         mode: 'lines',
-        name: 'Temp. Carne',
+        name: 'Meat Temp.',
         line: { color: '#f97316', width: 3.5 }
       };
 
@@ -465,13 +465,13 @@ streamlit run app.py</pre>
         margin: { l: 45, r: 20, t: 20, b: 40 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(240, 249, 255, 0.6)',
-        xaxis: { title: 'Tiempo de viaje (h)', gridcolor: '#e0f2fe' },
-        yaxis: { title: 'Temperatura (°C)', gridcolor: '#e0f2fe' },
+        xaxis: { title: 'Travel time (hours)', gridcolor: '#e0f2fe' },
+        yaxis: { title: 'Temperature (°C)', gridcolor: '#e0f2fe' },
         shapes: [
           {
             type: 'rect',
             x0: 0,
-            x1: tViaje,
+            x1: tTravel,
             y0: 0,
             y1: 7,
             fillcolor: 'rgba(2, 132, 199, 0.08)',
@@ -480,7 +480,7 @@ streamlit run app.py</pre>
           {
             type: 'line',
             x0: 0,
-            x1: tViaje,
+            x1: tTravel,
             y0: tAmb,
             y1: tAmb,
             line: { color: '#64748b', width: 1.5, dash: 'dot' }
@@ -492,17 +492,17 @@ streamlit run app.py</pre>
             y: 6.5,
             xref: 'x',
             yref: 'y',
-            text: 'Zona Segura (<7°C)',
+            text: 'Safe Cold Zone (<7°C)',
             showarrow: false,
             xanchor: 'left',
             font: { size: 10, color: '#0369a1' }
           },
           {
-            x: tViaje,
+            x: tTravel,
             y: tAmb,
             xref: 'x',
             yref: 'y',
-            text: `Ambiente (${tAmb}°C)`,
+            text: `Ambient (${tAmb}°C)`,
             showarrow: false,
             xanchor: 'right',
             yanchor: 'bottom',
@@ -513,11 +513,11 @@ streamlit run app.py</pre>
 
       Plotly.react('plot-temp', [traceTemp], layoutTemp, { responsive: true, displayModeBar: false });
 
-      // Gráfica 2: Crecimiento bacteriano
-      const colorBact = cfuFinal >= nCrit ? '#dc2626' : '#0284c7';
+      // Chart 2: Salmonella Growth vs Time
+      const colorBact = finalCfu >= nCrit ? '#dc2626' : '#0284c7';
       const traceBact = {
-        x: data.tiempos,
-        y: data.bacterias,
+        x: data.times,
+        y: data.bacteria,
         mode: 'lines',
         name: 'Salmonella spp.',
         line: { color: colorBact, width: 3.5 }
@@ -527,12 +527,12 @@ streamlit run app.py</pre>
         margin: { l: 55, r: 20, t: 20, b: 40 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(240, 249, 255, 0.6)',
-        xaxis: { title: 'Tiempo de viaje (h)', gridcolor: '#e0f2fe' },
-        yaxis: { title: 'Carga Bacteriana (CFU/g)', gridcolor: '#e0f2fe' },
+        xaxis: { title: 'Travel time (hours)', gridcolor: '#e0f2fe' },
+        yaxis: { title: 'Bacterial Load (CFU/g)', gridcolor: '#e0f2fe' },
         shapes: [{
           type: 'line',
           x0: 0,
-          x1: tViaje,
+          x1: tTravel,
           y0: nCrit,
           y1: nCrit,
           line: { color: '#dc2626', width: 2.5, dash: 'dash' }
@@ -542,7 +542,7 @@ streamlit run app.py</pre>
           y: nCrit,
           xref: 'x',
           yref: 'y',
-          text: 'Límite Legal INVIMA (1,000 CFU/g)',
+          text: 'INVIMA 2674 Legal Limit (1,000 CFU/g)',
           showarrow: false,
           xanchor: 'left',
           yanchor: 'bottom',
@@ -553,12 +553,12 @@ streamlit run app.py</pre>
       Plotly.react('plot-bact', [traceBact], layoutBact, { responsive: true, displayModeBar: false });
     }
 
-    // Listeners
+    // Input event listeners
     ['input-tamb', 'input-tviaje', 'select-empaque', 'input-t0'].forEach(id => {
-      document.getElementById(id).addEventListener('input', actualizarDashboard);
+      document.getElementById(id).addEventListener('input', updateDashboard);
     });
 
-    // Render KaTeX y Dashboard inicial al cargar
+    // Initial render
     document.addEventListener("DOMContentLoaded", () => {
       if (window.renderMathInElement) {
         renderMathInElement(document.body, {
@@ -568,7 +568,7 @@ streamlit run app.py</pre>
           ]
         });
       }
-      actualizarDashboard();
+      updateDashboard();
     });
   </script>
 </body>
