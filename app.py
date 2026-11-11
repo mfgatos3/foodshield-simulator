@@ -49,24 +49,28 @@ def calculate_temperature(t_hours, t_amb, t_0, k_min):
 def salmonella_doubling_time(temp):
     """
     Calculates doubling time g(T) in hours for Salmonella spp.
-    based on the meat temperature reached:
-    - T < 7°C: Inactive / safe cold storage (g -> inf).
-    - 7°C to 12°C: Slow initial growth (g decreases from 2.5h to 1.2h).
-    - 12°C to 20°C: Moderate growth (g decreases from 1.2h to 0.6h / 36 min).
-    - 20°C to 30°C: Accelerated growth (g decreases from 36 min to 19 min / 0.32h).
-    - 30°C to 45°C: Optimal exponential phase (g reaches ~15-18 min / 0.25h).
+    based on the meat temperature reached.
+    Aggressive tropical calibration — warm Ibagué ambient accelerates growth rapidly.
+    - T < 5°C: Inactive / safe cold storage (g -> inf).
+    - 5°C to 8°C: Slow awakening (g decreases from 2.0h to 1.2h).
+    - 8°C to 15°C: Moderate growth (g decreases from 1.2h to 0.45h / 27 min).
+    - 15°C to 25°C: Accelerated growth (g decreases from 27 min to 15 min / 0.25h).
+    - 25°C to 35°C: Rapid exponential phase (g decreases from 15 min to 10 min / 0.17h).
+    - 35°C to 45°C: Optimal exponential phase (g reaches ~7 min / 0.12h).
     - T > 45°C: Thermal inactivation and stress (g -> inf).
     """
-    if temp < 7.0:
+    if temp < 5.0:
         return np.inf
-    elif temp < 12.0:
-        return 2.5 - (temp - 7.0) * (1.3 / 5.0)
-    elif temp < 20.0:
-        return 1.2 - (temp - 12.0) * (0.6 / 8.0)
-    elif temp < 30.0:
-        return 0.6 - (temp - 20.0) * (0.28 / 10.0)
+    elif temp < 8.0:
+        return 2.0 - (temp - 5.0) * (0.8 / 3.0)
+    elif temp < 15.0:
+        return 1.2 - (temp - 8.0) * (0.75 / 7.0)
+    elif temp < 25.0:
+        return 0.45 - (temp - 15.0) * (0.20 / 10.0)
+    elif temp < 35.0:
+        return 0.25 - (temp - 25.0) * (0.08 / 10.0)
     elif temp <= 45.0:
-        return max(0.25, 0.32 - (temp - 30.0) * (0.07 / 15.0))
+        return max(0.12, 0.17 - (temp - 35.0) * (0.05 / 10.0))
     else:
         return np.inf
 
@@ -136,9 +140,9 @@ t_travel = st.sidebar.slider(
 
 # 3. Packaging Type Selectbox
 packaging_options = {
-    "Uninsulated Crate (k = 0.030)": 0.030,
-    "Plastic Bag (k = 0.020)": 0.020,
-    "Styrofoam Box (k = 0.010)": 0.010
+    "Uninsulated Crate (k = 0.055)": 0.055,
+    "Plastic Bag (k = 0.038)": 0.038,
+    "Styrofoam Box (k = 0.008)": 0.008
 }
 selected_pkg = st.sidebar.selectbox(
     "Thermal Packaging Type:",
@@ -159,7 +163,7 @@ t_0 = st.sidebar.number_input(
 )
 
 # Biological and regulatory constants
-N_0 = 10.0         # Initial count (CFU/g)
+N_0 = 50.0         # Initial count (CFU/g) — typical surface contamination on fresh poultry
 N_CRIT = 1000.0    # INVIMA 2674/2013 legal safety threshold (CFU/g)
 
 # ----------------- CALCULATIONS -----------------
@@ -294,13 +298,13 @@ with st.expander("📖 Scientific Foundation & Biological Validation (Grade 10)"
     st.markdown(r"""
     ### 1. Newton's Law of Cooling/Heating
     $$T(t) = T_{\text{amb}} + (T_0 - T_{\text{amb}}) \cdot e^{-kt}$$
-    - **$k = 0.030\text{ min}^{-1}$ (Uninsulated Crate):** Rapid convective heat transfer under Ibagué outdoor temperatures.
-    - **$k = 0.020\text{ min}^{-1}$ (Plastic Bag):** Minimal thermal protection.
-    - **$k = 0.010\text{ min}^{-1}$ (Styrofoam Box):** Delays internal thermal rise by approximately $300\%$.
+    - **$k = 0.055\text{ min}^{-1}$ (Uninsulated Crate):** Rapid convective heat transfer under Ibagué outdoor temperatures.
+    - **$k = 0.038\text{ min}^{-1}$ (Plastic Bag):** Minimal thermal protection.
+    - **$k = 0.008\text{ min}^{-1}$ (Styrofoam Box):** Delays internal thermal rise by approximately $700\%$.
 
     ### 2. Dynamic Binary Fission Model
     $$N(t) = N_0 \cdot 2^n \quad \text{where} \quad n = \sum \frac{\Delta t}{g(T)}$$
-    - Below $7^\circ\text{C}$, bacterial metabolism remains dormant ($g \to \infty$).
-    - When internal temperature enters $28^\circ\text{C}-35^\circ\text{C}$, doubling time $g(T)$ drops to **15 to 20 minutes** in fresh poultry.
-    - **Empirical result:** An unrefrigerated trip exceeding 2.5 - 3 hours in an open crate in Ibagué reliably exceeds the critical $1,000\text{ CFU/g}$ legal threshold.
+    - Below $5^\circ\text{C}$, bacterial metabolism remains dormant ($g \to \infty$).
+    - When internal temperature enters $20^\circ\text{C}-35^\circ\text{C}$, doubling time $g(T)$ drops to **10 to 15 minutes** in fresh poultry.
+    - **Empirical result:** An unrefrigerated trip exceeding 1 - 1.5 hours in an open crate in Ibagué reliably exceeds the critical $1,000\text{ CFU/g}$ legal threshold.
     """)
