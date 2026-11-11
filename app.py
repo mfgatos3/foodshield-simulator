@@ -118,6 +118,12 @@ st.markdown("---")
 # ----------------- SIDEBAR -----------------
 st.sidebar.header("⚙️ Simulation Parameters")
 
+def mark_interaction():
+    st.session_state["has_interacted"] = True
+
+if "has_interacted" not in st.session_state:
+    st.session_state["has_interacted"] = False
+
 # 1. Ambient Temperature Slider
 t_amb = st.sidebar.slider(
     "Ambient Temperature ($T_{\\text{amb}}$ in °C):",
@@ -125,6 +131,7 @@ t_amb = st.sidebar.slider(
     max_value=35.0,
     value=28.0,
     step=0.5,
+    on_change=mark_interaction,
     help="Typical outdoor ambient temperature during transit in Ibagué."
 )
 
@@ -135,6 +142,7 @@ t_travel = st.sidebar.slider(
     max_value=4.0,
     value=2.0,
     step=0.5,
+    on_change=mark_interaction,
     help="Duration of transit without active refrigeration (0.5h steps)."
 )
 
@@ -148,6 +156,7 @@ selected_pkg = st.sidebar.selectbox(
     "Thermal Packaging Type:",
     options=list(packaging_options.keys()),
     index=0,
+    on_change=mark_interaction,
     help="The k coefficient denotes heat transfer rate through the container."
 )
 k_val = packaging_options[selected_pkg]
@@ -159,6 +168,7 @@ t_0 = st.sidebar.number_input(
     max_value=15.0,
     value=4.0,
     step=0.5,
+    on_change=mark_interaction,
     help="Initial cold storage temperature prior to transit (target: 4°C)."
 )
 
@@ -166,132 +176,141 @@ t_0 = st.sidebar.number_input(
 N_0 = 50.0         # Initial count (CFU/g) — typical surface contamination on fresh poultry
 N_CRIT = 1000.0    # INVIMA 2674/2013 legal safety threshold (CFU/g)
 
-# ----------------- CALCULATIONS -----------------
-times, temps, bacteria = simulate_growth(
-    t_total_hours=t_travel,
-    t_amb=t_amb,
-    t_0=t_0,
-    k_min=k_val,
-    n_0=N_0
-)
+if not st.session_state["has_interacted"]:
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("🌡️ Final Temp", "-- °C", "Awaiting input")
+    m2.metric("⏱️ Travel Duration", "-- h", "Awaiting input")
+    m3.metric("🧫 Salmonella spp.", "-- CFU/g", "Awaiting input")
+    m4.metric("⚖️ Legal Threshold", f"{N_CRIT:,.0f} CFU/g", "INVIMA Res. 2674")
 
-final_temp = temps[-1]
-final_cfu = bacteria[-1]
-
-# ----------------- KPI METRIC CARDS -----------------
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("🌡️ Final Temp", f"{final_temp:.1f} °C", f"+{final_temp - t_0:.1f} °C")
-m2.metric("⏱️ Travel Duration", f"{t_travel:.1f} h", "Unrefrigerated")
-m3.metric(
-    "🧫 Salmonella spp.", 
-    f"{final_cfu:,.0f} CFU/g", 
-    f"{final_cfu - N_0:+,.0f} CFU/g",
-    delta_color="inverse"
-)
-m4.metric("⚖️ Legal Threshold", f"{N_CRIT:,.0f} CFU/g", "INVIMA Res. 2674")
-
-# ----------------- SANITARY ALERT BOX -----------------
-st.markdown("### 🚦 Batch Food Safety Diagnosis")
-if final_cfu >= N_CRIT:
-    excess = ((final_cfu - N_CRIT) / N_CRIT) * 100
-    st.error(
-        f"🚨 **SANITARY ALERT: Product exceeds the safe INVIMA threshold.**\n\n"
-        f"- Final bacterial load: **{final_cfu:,.0f} CFU/g** (Exceeds legal limit by **+{excess:,.1f}%**).\n"
-        f"- Condition: Cold chain was lost, allowing exponential proliferation of pathogens.\n"
-        f"- Action: **Batch rejected**. Prohibited for commercial distribution or human consumption."
-    )
+    st.info("🎛️ **Awaiting Simulation Parameters**: Move the sliders or select packaging in the sidebar to simulate thermal degradation and bacterial proliferation.")
 else:
-    safety_margin = ((N_CRIT - final_cfu) / N_CRIT) * 100
-    st.success(
-        f"✅ **SAFE PRODUCT**\n\n"
-        f"- Final estimated load: **{final_cfu:,.0f} CFU/g** (Below legal threshold of {N_CRIT:,.0f} CFU/g).\n"
-        f"- Safety margin: **{safety_margin:.1f}%** remaining safety cushion.\n"
-        f"- Packaging and transit duration preserved meat safety within regulatory standards."
+    # ----------------- CALCULATIONS -----------------
+    times, temps, bacteria = simulate_growth(
+        t_total_hours=t_travel,
+        t_amb=t_amb,
+        t_0=t_0,
+        k_min=k_val,
+        n_0=N_0
     )
 
-st.markdown("---")
+    final_temp = temps[-1]
+    final_cfu = bacteria[-1]
 
-# ----------------- INTERACTIVE CHARTS -----------------
-col_g1, col_g2 = st.columns(2)
+    # ----------------- KPI METRIC CARDS -----------------
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("🌡️ Final Temp", f"{final_temp:.1f} °C", f"+{final_temp - t_0:.1f} °C")
+    m2.metric("⏱️ Travel Duration", f"{t_travel:.1f} h", "Unrefrigerated")
+    m3.metric(
+        "🧫 Salmonella spp.", 
+        f"{final_cfu:,.0f} CFU/g", 
+        f"{final_cfu - N_0:+,.0f} CFU/g",
+        delta_color="inverse"
+    )
+    m4.metric("⚖️ Legal Threshold", f"{N_CRIT:,.0f} CFU/g", "INVIMA Res. 2674")
 
-with col_g1:
-    st.subheader("📈 Thermal Curve: Temperature vs. Time")
-    fig_temp = go.Figure()
-    
-    fig_temp.add_trace(go.Scatter(
-        x=times,
-        y=temps,
-        mode="lines",
-        name="Meat Temp.",
-        line=dict(color="#f97316", width=3.5)
-    ))
-    
-    # Ambient reference line
-    fig_temp.add_hline(
-        y=t_amb,
-        line_dash="dot",
-        line_color="#64748b",
-        annotation_text=f"Ambient ({t_amb}°C)",
-        annotation_position="bottom right"
-    )
+    # ----------------- SANITARY ALERT BOX -----------------
+    st.markdown("### 🚦 Batch Food Safety Diagnosis")
+    if final_cfu >= N_CRIT:
+        excess = ((final_cfu - N_CRIT) / N_CRIT) * 100
+        st.error(
+            f"🚨 **SANITARY ALERT: Product exceeds the safe INVIMA threshold.**\n\n"
+            f"- Final bacterial load: **{final_cfu:,.0f} CFU/g** (Exceeds legal limit by **+{excess:,.1f}%**).\n"
+            f"- Condition: Cold chain was lost, allowing exponential proliferation of pathogens.\n"
+            f"- Action: **Batch rejected**. Prohibited for commercial distribution or human consumption."
+        )
+    else:
+        safety_margin = ((N_CRIT - final_cfu) / N_CRIT) * 100
+        st.success(
+            f"✅ **SAFE PRODUCT**\n\n"
+            f"- Final estimated load: **{final_cfu:,.0f} CFU/g** (Below legal threshold of {N_CRIT:,.0f} CFU/g).\n"
+            f"- Safety margin: **{safety_margin:.1f}%** remaining safety cushion.\n"
+            f"- Packaging and transit duration preserved meat safety within regulatory standards."
+        )
 
-    # Safe refrigeration zone
-    fig_temp.add_hrect(
-        y0=0, y1=7,
-        fillcolor="#0284c7", opacity=0.08,
-        line_width=0,
-        annotation_text="Safe Dormancy Zone (<7°C)",
-        annotation_position="top left"
-    )
-    
-    fig_temp.update_layout(
-        xaxis_title="Travel time (hours)",
-        yaxis_title="Temperature (°C)",
-        template="plotly_white",
-        hovermode="x unified",
-        margin=dict(l=40, r=20, t=30, b=40),
-        height=380,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(240,249,255,0.6)"
-    )
-    st.plotly_chart(fig_temp, use_container_width=True)
+    st.markdown("---")
 
-with col_g2:
-    st.subheader("🔬 Salmonella spp. Growth vs. Time")
-    fig_bact = go.Figure()
-    
-    line_color = "#dc2626" if final_cfu >= N_CRIT else "#0284c7"
-    
-    fig_bact.add_trace(go.Scatter(
-        x=times,
-        y=bacteria,
-        mode="lines",
-        name="CFU/g",
-        line=dict(color=line_color, width=3.5)
-    ))
-    
-    # Legal threshold dashed horizontal line
-    fig_bact.add_hline(
-        y=N_CRIT,
-        line_dash="dash",
-        line_color="#dc2626",
-        line_width=2.5,
-        annotation_text="INVIMA 2674 Legal Limit (1,000 CFU/g)",
-        annotation_position="top left",
-        annotation_font_color="#dc2626"
-    )
-    
-    fig_bact.update_layout(
-        xaxis_title="Travel time (hours)",
-        yaxis_title="Bacterial Load (CFU/g)",
-        template="plotly_white",
-        hovermode="x unified",
-        margin=dict(l=40, r=20, t=30, b=40),
-        height=380,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(240,249,255,0.6)"
-    )
-    st.plotly_chart(fig_bact, use_container_width=True)
+    # ----------------- INTERACTIVE CHARTS -----------------
+    col_g1, col_g2 = st.columns(2)
+
+    with col_g1:
+        st.subheader("📈 Thermal Curve: Temperature vs. Time")
+        fig_temp = go.Figure()
+        
+        fig_temp.add_trace(go.Scatter(
+            x=times,
+            y=temps,
+            mode="lines",
+            name="Meat Temp.",
+            line=dict(color="#f97316", width=3.5)
+        ))
+        
+        # Ambient reference line
+        fig_temp.add_hline(
+            y=t_amb,
+            line_dash="dot",
+            line_color="#64748b",
+            annotation_text=f"Ambient ({t_amb}°C)",
+            annotation_position="bottom right"
+        )
+
+        # Safe refrigeration zone
+        fig_temp.add_hrect(
+            y0=0, y1=7,
+            fillcolor="#0284c7", opacity=0.08,
+            line_width=0,
+            annotation_text="Safe Dormancy Zone (<7°C)",
+            annotation_position="top left"
+        )
+        
+        fig_temp.update_layout(
+            xaxis_title="Travel time (hours)",
+            yaxis_title="Temperature (°C)",
+            template="plotly_white",
+            hovermode="x unified",
+            margin=dict(l=40, r=20, t=30, b=40),
+            height=380,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(240,249,255,0.6)"
+        )
+        st.plotly_chart(fig_temp, use_container_width=True)
+
+    with col_g2:
+        st.subheader("🔬 Salmonella spp. Growth vs. Time")
+        fig_bact = go.Figure()
+        
+        line_color = "#dc2626" if final_cfu >= N_CRIT else "#0284c7"
+        
+        fig_bact.add_trace(go.Scatter(
+            x=times,
+            y=bacteria,
+            mode="lines",
+            name="CFU/g",
+            line=dict(color=line_color, width=3.5)
+        ))
+        
+        # Legal threshold dashed horizontal line
+        fig_bact.add_hline(
+            y=N_CRIT,
+            line_dash="dash",
+            line_color="#dc2626",
+            line_width=2.5,
+            annotation_text="INVIMA 2674 Legal Limit (1,000 CFU/g)",
+            annotation_position="top left",
+            annotation_font_color="#dc2626"
+        )
+        
+        fig_bact.update_layout(
+            xaxis_title="Travel time (hours)",
+            yaxis_title="Bacterial Load (CFU/g)",
+            template="plotly_white",
+            hovermode="x unified",
+            margin=dict(l=40, r=20, t=30, b=40),
+            height=380,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(240,249,255,0.6)"
+        )
+        st.plotly_chart(fig_bact, use_container_width=True)
 
 # ----------------- SCIENTIFIC FOUNDATION -----------------
 with st.expander("📖 Scientific Foundation & Biological Validation (Grade 10)"):
