@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FoodShield - Cold Chain Simulation</title>
+  <title>FoodShield : Cold Chain Simulation &amp; QMRA Risk Assessment</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -43,6 +43,36 @@
       backdrop-filter: blur(8px);
       border: 1px solid #e0f2fe;
     }
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+      aside.st-sidebar, #status-badge, .no-print, button {
+        display: none !important;
+      }
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .glass-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        page-break-inside: avoid;
+      }
+      #report-card {
+        border: none !important;
+        box-shadow: none !important;
+        page-break-before: auto;
+      }
+      article {
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+      }
+    }
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col md:flex-row">
@@ -59,7 +89,7 @@
             <h1 class="text-xl font-black tracking-tight text-sky-950">FoodShield</h1>
             <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-200 text-sky-800">FROST</span>
           </div>
-          <p class="text-xs text-sky-700 font-medium">Ibagué • Grade 10 Level</p>
+          <p class="text-xs text-sky-700 font-medium">Ibague : Grade 10 Level</p>
         </div>
       </div>
 
@@ -86,9 +116,9 @@
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
             <label class="font-semibold text-sky-950">Travel Time (<span class="italic">t</span>):</label>
-            <span id="label-tviaje" class="font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 text-xs">-- h</span>
+            <span id="label-travel-time" class="font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 text-xs">-- h</span>
           </div>
-          <input id="input-tviaje" type="range" min="0.5" max="4.0" step="0.5" value="2.0" 
+          <input id="input-travel-time" type="range" min="0.5" max="4.0" step="0.5" value="2.0" 
                  class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
           <div class="flex justify-between text-[10px] text-sky-600 mt-1 font-medium">
             <span>0.5h (Quick)</span>
@@ -99,17 +129,31 @@
         <!-- 3. Packaging Type Selectbox -->
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <label class="block text-sm font-semibold text-sky-950 mb-1.5">Thermal Packaging Type:</label>
-          <select id="select-empaque" class="w-full bg-white border border-sky-300 text-slate-800 text-sm rounded-lg p-2.5 font-medium focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+          <select id="select-packaging" class="w-full bg-white border border-sky-300 text-slate-800 text-sm rounded-lg p-2.5 font-medium focus:ring-sky-500 focus:border-sky-500 shadow-sm">
             <option value="0.055" selected>📦 Uninsulated Crate (k = 0.055)</option>
             <option value="0.038">🛍️ Plastic Bag (k = 0.038)</option>
             <option value="0.008">🧊 Styrofoam Box (k = 0.008)</option>
           </select>
           <p class="text-[11px] text-sky-700 mt-1.5 leading-snug">
-            <em>k = 0.008 (Styrofoam)</em> insulates ~7× better than an open crate, preserving the cold chain.
+            <em>k = 0.008 (Styrofoam)</em> insulates ~7x better than an open crate, preserving the cold chain.
           </p>
         </div>
 
-        <!-- 4. Initial Meat Temperature -->
+        <!-- 4. Serving Portion Size Slider -->
+        <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
+          <div class="flex justify-between items-center mb-1 text-sm">
+            <label class="font-semibold text-sky-950">Serving Portion Size (<span class="italic">m</span>):</label>
+            <span id="label-portion" class="font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 text-xs">-- g</span>
+          </div>
+          <input id="input-portion" type="range" min="50" max="300" step="25" value="150" 
+                 class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer accent-sky-600">
+          <div class="flex justify-between text-[10px] text-sky-600 mt-1 font-medium">
+            <span>50 g (Light)</span>
+            <span>300 g (Full Meal)</span>
+          </div>
+        </div>
+
+        <!-- 5. Initial Meat Temperature -->
         <div class="mb-5 bg-white/70 p-3 rounded-xl border border-sky-200 shadow-sm">
           <div class="flex justify-between items-center mb-1 text-sm">
             <label class="font-semibold text-sky-950">Initial Meat Temp. (<span class="italic">T</span><sub>0</sub>):</label>
@@ -132,6 +176,10 @@
         <span>INVIMA Legal Threshold:</span>
         <span class="font-bold text-red-600">1,000 CFU/g</span>
       </div>
+      <div class="flex justify-between">
+        <span>Cross-Contamination Rate:</span>
+        <span class="font-bold">1% (WHO)</span>
+      </div>
       <p class="pt-2 text-[11px] text-sky-600 border-t border-sky-200">Resolution 2674/2013 Colombia</p>
     </div>
   </aside>
@@ -143,11 +191,11 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-2xl md:text-3xl font-black text-sky-950 tracking-tight">
-            Thermal Monitoring & Growth of <span class="italic text-sky-600">Salmonella spp.</span>
+            Thermal Monitoring &amp; Growth of <span class="italic text-sky-600">Salmonella spp.</span>
           </h1>
         </div>
         <p class="text-sm text-slate-600 mt-1">
-          Biosecurity food safety simulator for poultry transport in the warm climate of Ibagué, Tolima.
+          Biosecurity food safety simulator for poultry transport in the warm climate of Ibague, Tolima.
         </p>
       </div>
       <span id="status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
@@ -155,8 +203,8 @@
       </span>
     </div>
 
-    <!-- KPI METRIC CARDS -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- KPI METRIC CARDS (5 METRICS) -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
         <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🌡️ Final Temp</div>
         <div id="kpi-temp" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- °C</div>
@@ -164,7 +212,7 @@
       </div>
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
         <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⏱️ Travel Duration</div>
-        <div id="kpi-tiempo" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- h</div>
+        <div id="kpi-travel-time" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- h</div>
         <div class="text-xs font-medium text-slate-400 mt-0.5">Without refrigeration</div>
       </div>
       <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
@@ -176,6 +224,11 @@
         <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">⚖️ Legal Threshold</div>
         <div class="text-2xl lg:text-3xl font-black text-rose-700 mt-1">1,000 CFU/g</div>
         <div class="text-xs font-medium text-slate-400 mt-0.5">INVIMA Res. 2674</div>
+      </div>
+      <div class="glass-card p-4 rounded-2xl shadow-sm border border-sky-100">
+        <div class="text-xs uppercase font-bold text-sky-700 tracking-wider">🛡️ Salmonellosis Risk</div>
+        <div id="kpi-risk" class="text-2xl lg:text-3xl font-black text-slate-900 mt-1">-- %</div>
+        <div id="kpi-risk-badge" class="mt-1 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-600">Awaiting Input</div>
       </div>
     </div>
 
@@ -228,17 +281,17 @@
     <!-- SCIENTIFIC FOUNDATION & BIOLOGICAL VALIDATION -->
     <div class="glass-card rounded-2xl shadow-sm border border-sky-100 p-6 mb-8">
       <h3 class="text-base font-bold text-sky-950 mb-4 flex items-center gap-2">
-        📚 Scientific Foundation & Biological Validation (Grade 10)
+        📚 Scientific Foundation &amp; Biological Validation (Grade 10)
       </h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-700">
         <div class="space-y-3">
           <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">1. Newton's Law of Cooling/Heating</h4>
           <div class="p-3 bg-sky-50/50 rounded-xl text-center font-serif text-base border border-sky-200">
             $$T(t) = T_{\text{amb}} + (T_0 - T_{\text{amb}}) \cdot e^{-kt}$$
           </div>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Models convective heat transfer between ambient air in Ibagué and poultry meat mass. 
+            Models convective heat transfer between ambient air in Ibague and poultry meat mass. 
             Styrofoam (<em>Styrofoam Box</em>, $k = 0.008$) significantly delays thermal elevation compared to an uninsulated open crate ($k = 0.055$).
           </p>
         </div>
@@ -249,88 +302,64 @@
             $$N(t) = N_0 \cdot 2^n \quad \text{where} \quad n = \sum \frac{\Delta t}{g(T)}$$
           </div>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Doubling time $g(T)$ decreases rapidly with heat: below $5^\circ\text{C}$ bacteria remain dormant; but at temperatures between $20^\circ\text{C}-35^\circ\text{C}$, cells divide every <strong>10 to 15 minutes</strong>, triggering rapid exponential proliferation that can exceed legal limits within 1 hour of transport.
+            Doubling time $g(T)$ decreases rapidly with heat: below $5^\circ\text{C}$ bacteria remain dormant; but at temperatures between $20^\circ\text{C}$ and $35^\circ\text{C}$, cells divide every 10 to 15 minutes, triggering rapid exponential proliferation.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-bold text-sky-900 border-b border-sky-100 pb-1">3. QMRA Beta-Poisson Dose-Response</h4>
+          <div class="p-3 bg-sky-50/50 rounded-xl text-center font-serif text-sm border border-sky-200">
+            $$D = N(t) \cdot m \cdot 0.01$$
+            $$P_{\text{inf}} = 1 - \left(1 + \frac{D}{51.45}\right)^{-0.1324}$$
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            FAO/WHO standard quantitative microbial risk assessment for <em>Salmonella enterica</em>. Ingested cross-contamination dose $D$ assumes a 1% transfer rate during handling, converting bacterial load into clinical infection probability.
           </p>
         </div>
       </div>
     </div>
 
-    <!-- ACADEMIC ARGUMENTATIVE ESSAY (GRADE 10 DELIVERABLE) -->
-    <div class="glass-card rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8 mb-8">
+    <!-- REAL-TIME DYNAMIC ARGUMENTATIVE ESSAY GENERATOR -->
+    <div id="report-card" class="glass-card rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8 mb-8">
       <div class="border-b border-sky-100 pb-4 mb-6">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 class="text-xl md:text-2xl font-black text-sky-950 tracking-tight flex items-center gap-2">
-            📄 Academic Argumentative Essay (Grade 10 Deliverable)
-          </h2>
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200 shadow-xs">
-            Policy & Biothermal Research
-          </span>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl md:text-2xl font-black text-sky-950 tracking-tight flex items-center gap-2">
+              📄 Live Academic Policy &amp; Argumentative Report (Grade 10)
+            </h2>
+            <p class="text-xs md:text-sm font-semibold text-sky-700 mt-1">
+              Formal Policy &amp; Biothermal Research Paper in English
+            </p>
+          </div>
+          <div class="flex items-center gap-2 no-print">
+            <button id="btn-copy-report" onclick="copyReportToClipboard()" 
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border border-sky-300 bg-white hover:bg-sky-50 text-sky-800 shadow-xs transition-all cursor-pointer">
+              📋 Copy Report
+            </button>
+            <button id="btn-print-report" onclick="printReport()" 
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border border-sky-600 bg-sky-600 hover:bg-sky-700 text-white shadow-xs transition-all cursor-pointer">
+              🖨️ Print / Save PDF
+            </button>
+          </div>
         </div>
-        <p class="text-xs md:text-sm font-semibold text-sky-700 mt-1">
-          Formal Policy & Biothermal Research Paper in English
+      </div>
+
+      <!-- Clean Placeholder State -->
+      <div id="essay-placeholder" class="py-12 flex flex-col items-center justify-center text-center text-slate-500 border border-dashed border-sky-200 rounded-xl bg-sky-50/40 p-8">
+        <span class="text-4xl mb-3">📝</span>
+        <p class="text-sm font-semibold text-sky-900 max-w-md">
+          Adjust any simulation parameter in the sidebar to calculate biological risk and generate the live argumentative report.
         </p>
       </div>
 
-      <div class="space-y-6 text-sm leading-relaxed text-slate-700">
-        <!-- Section 1 -->
-        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
-          <h3 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">1</span>
-            Section 1: Problem Framing and Thesis Statement
-          </h3>
-          <p class="text-justify text-slate-700 leading-relaxed">
-            In many developing urban areas, such as Comuna 8 in Ibagué, Colombia, the informal transportation of fresh food presents a critical challenge to public health. Small vendors often move perishable items across the city using uninsulated and unrefrigerated vehicles. During these short journeys, produce and animal products are exposed to warm ambient temperatures, which accelerates microbial decay. Many residents and drivers accept this food degradation as an unavoidable reality of local commerce. However, food degradation is not an inevitable accident, but a preventable risk that can be evaluated and mitigated using biothermal simulation.
-          </p>
-        </article>
-
-        <!-- Section 2 -->
-        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
-          <h3 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">2</span>
-            Section 2: Scientific & Mathematical Evidence
-          </h3>
-          <p class="text-justify text-slate-700 leading-relaxed">
-            The biological process of food spoilage follows clear mathematical and physical principles. According to Newton's Law of Cooling, heat transfer occurs rapidly when the ambient temperature is higher than the food surface temperature. As food warms up during transport, bacteria such as <em>Salmonella spp.</em> begin to reproduce at dangerous rates. Microorganisms multiply through binary fission, which can be modeled by the exponential growth equation $N(t) = N_0 \cdot 2^n$, where $N_0$ represents the initial bacterial count and $n$ represents the number of division cycles. Under warm environmental conditions, bacterial populations can double rapidly. Even during short transport times of under an hour, bacterial concentration easily exceeds the safe legal limit of $1,000 \text{ CFU/g}$ established by INVIMA Resolution 2674 of 2013. Consequently, brief delays in warm vehicles transform healthy food into a biological hazard for consumers.
-          </p>
-        </article>
-
-        <!-- Section 3 -->
-        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
-          <h3 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">3</span>
-            Section 3: Socio-Spatial Context & Distributive Justice
-          </h3>
-          <p class="text-justify text-slate-700 leading-relaxed">
-            This biological vulnerability directly impacts the most marginalized populations of Ibagué, specifically in Comuna 8. According to statistical data from DANE and the Unique Victims Registry (RUV), Comuna 8 has a high concentration of displaced families and low-income residents who already face severe food insecurity. Families in this area rely heavily on informal local markets because formal supermarkets are less accessible and more expensive. When degraded food reaches these local stalls, low-income households bear the highest burden of foodborne illnesses. From an ethical perspective rooted in distributive justice, access to safe and nutritious food must be treated as a fundamental human right rather than a privilege reserved for wealthier neighborhoods. Protecting the transportation of food protects vulnerable citizens from preventable health risks.
-          </p>
-        </article>
-
-        <!-- Section 4 -->
-        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
-          <h3 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">4</span>
-            Section 4: Counterargument & Rebuttal
-          </h3>
-          <p class="text-justify text-slate-700 leading-relaxed">
-            Critics may argue that solving this issue requires expensive refrigerated trucks, which local vendors and informal drivers in Ibagué cannot afford. From this perspective, enforcing strict cold-chain logistics seems financially impossible for small-scale operations. However, industrial refrigeration is not the only effective solution to preserve food safety. Practical biothermal simulation demonstrates that simple, low-cost operational adjustments can drastically reduce thermal risk. For instance, adjusting departure schedules to the early morning hours, when ambient temperatures are significantly cooler, minimizes heat absorption. Furthermore, combining smart delivery scheduling with simple insulating packaging, such as thermal covers or reusable insulated containers, keeps food temperatures below critical thresholds. These accessible interventions prove that food safety can be greatly improved without expensive machinery.
-          </p>
-        </article>
-
-        <!-- Section 5 -->
-        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
-          <h3 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">5</span>
-            Section 5: Conclusion & Recommendations
-          </h3>
-          <p class="text-justify text-slate-700 leading-relaxed">
-            In conclusion, food degradation during informal transport in Ibagué is a predictable and preventable risk with deep social consequences. By utilizing biothermal simulation, local stakeholders can accurately measure heat exposure and protect public health. To implement effective solutions, local health authorities in Ibagué should establish educational workshops for informal transporters, providing practical guidelines on thermal control and food safety regulations. Simultaneously, community vendors should adopt early-morning delivery routines and invest in low-cost insulating packaging to protect their products. Through these coordinated actions, Ibagué can strengthen its local food supply chain and guarantee food security for the residents of Comuna 8.
-          </p>
-        </article>
+      <!-- Populated Dynamic Content -->
+      <div id="essay-content" class="space-y-6 text-sm leading-relaxed text-slate-700 hidden">
+        <!-- Rendered in real-time by JavaScript -->
       </div>
     </div>
 
     <!-- LOCAL PYTHON STREAMLIT INSTRUCTIONS -->
-    <div class="bg-sky-950 text-sky-100 rounded-2xl p-5 shadow-sm text-xs md:text-sm border border-sky-900">
+    <div class="bg-sky-950 text-sky-100 rounded-2xl p-5 shadow-sm text-xs md:text-sm border border-sky-900 no-print">
       <div class="flex items-center justify-between mb-2">
         <span class="font-mono text-sky-300 font-bold flex items-center gap-2">
           🐍 Native Streamlit Python script available in repository (app.py)
@@ -355,10 +384,10 @@ streamlit run app.py</pre>
     }
 
     // Calibrated doubling time for Salmonella spp. in fresh poultry meat
-    // Aggressive tropical calibration — warm Ibagué ambient accelerates growth rapidly
+    // Tropical calibration: warm Ibague ambient accelerates growth rapidly
     function doublingTime(temp) {
       if (temp < 5.0) return Infinity; // Dormancy / safe cold storage (strict threshold)
-      if (temp < 8.0)  return 2.0 - (temp - 5.0) * (0.8 / 3.0);  // 2.0h -> 1.2h  (slow awakening)
+      if (temp < 8.0)  return 2.0 - (temp - 5.0) * (0.8 / 3.0);  // 2.0h -> 1.2h (slow awakening)
       if (temp < 15.0) return 1.2 - (temp - 8.0) * (0.75 / 7.0);  // 1.2h -> 0.45h (27 min)
       if (temp < 25.0) return 0.45 - (temp - 15.0) * (0.20 / 10.0); // 27 min -> 15 min (0.25h)
       if (temp < 35.0) return 0.25 - (temp - 25.0) * (0.08 / 10.0); // 15 min -> 10 min (0.17h)
@@ -366,6 +395,7 @@ streamlit run app.py</pre>
       return Infinity; // Thermal stress / inactivation above 45°C
     }
 
+    // Dynamic simulation over transit time
     function simulate(tTravel, tAmb, t0, kMin, n0 = 50.0, steps = 250) {
       const times = [];
       const temps = [];
@@ -396,31 +426,68 @@ streamlit run app.py</pre>
       return { times, temps, bacteria };
     }
 
+    // Quantitative Microbial Risk Assessment (QMRA): Beta-Poisson Model (FAO/WHO)
+    function calculateInfectionProbability(cfuPerGram, portionGrams) {
+      // Ingested cross-contamination dose: 1% transfer rate during handling
+      const dose = cfuPerGram * portionGrams * 0.01;
+      if (dose <= 0) return 0.0;
+      // Beta-Poisson model: P_inf = 1 - (1 + D / beta)^(-alpha)
+      // FAO/WHO parameters for Salmonella enterica: alpha = 0.1324, beta = 51.45
+      const alpha = 0.1324;
+      const beta = 51.45;
+      const pInf = 1.0 - Math.pow(1.0 + (dose / beta), -alpha);
+      return Math.min(1.0, Math.max(0.0, pInf));
+    }
+
+    let simulationStarted = false;
+
     function updateDashboard() {
       const tAmb = parseFloat(document.getElementById('input-tamb').value);
-      const tTravel = parseFloat(document.getElementById('input-tviaje').value);
-      const kVal = parseFloat(document.getElementById('select-empaque').value);
+      const tTravel = parseFloat(document.getElementById('input-travel-time').value);
+      const selectPackaging = document.getElementById('select-packaging');
+      const kVal = parseFloat(selectPackaging.value);
+      const pkgName = selectPackaging.options[selectPackaging.selectedIndex].text.replace(/^[^\w\s]+/u, '').trim();
+      const portionG = parseFloat(document.getElementById('input-portion').value);
       const t0 = parseFloat(document.getElementById('input-t0').value) || 4.0;
       const nCrit = 1000.0;
       const n0 = 50.0;
 
-      // Update input display labels
+      // Update sidebar slider labels
       document.getElementById('label-tamb').innerText = tAmb.toFixed(1) + " °C";
-      document.getElementById('label-tviaje').innerText = tTravel.toFixed(1) + " h";
+      document.getElementById('label-travel-time').innerText = tTravel.toFixed(1) + " h";
+      document.getElementById('label-portion').innerText = portionG.toFixed(0) + " g";
 
       // Run simulation
       const data = simulate(tTravel, tAmb, t0, kVal, n0);
       const finalTemp = data.temps[data.temps.length - 1];
       const finalCfu = data.bacteria[data.bacteria.length - 1];
 
+      // Calculate QMRA Infection Probability
+      const infectionProb = calculateInfectionProbability(finalCfu, portionG);
+      const riskPercent = infectionProb * 100.0;
+
       // Update KPI Cards
       document.getElementById('kpi-temp').innerText = finalTemp.toFixed(1) + " °C";
       const deltaT = finalTemp - t0;
       document.getElementById('kpi-temp-delta').innerText = (deltaT >= 0 ? "+" : "") + deltaT.toFixed(1) + " °C vs dispatch";
-      document.getElementById('kpi-tiempo').innerText = tTravel.toFixed(1) + " h";
+      document.getElementById('kpi-travel-time').innerText = tTravel.toFixed(1) + " h";
       document.getElementById('kpi-bact').innerText = Math.round(finalCfu).toLocaleString() + " CFU/g";
 
       const subBact = document.getElementById('kpi-bact-sub');
+
+      // Update 5th KPI Card: Salmonellosis Risk
+      document.getElementById('kpi-risk').innerText = riskPercent.toFixed(1) + " %";
+      const riskBadge = document.getElementById('kpi-risk-badge');
+      if (riskPercent < 10.0) {
+        riskBadge.className = "mt-1 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        riskBadge.innerText = "Low Risk";
+      } else if (riskPercent <= 30.0) {
+        riskBadge.className = "mt-1 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200";
+        riskBadge.innerText = "Moderate Risk";
+      } else {
+        riskBadge.className = "mt-1 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200";
+        riskBadge.innerText = "High Infection Risk";
+      }
 
       // Dynamic Alert Box
       const alertBox = document.getElementById('alert-box');
@@ -436,11 +503,11 @@ streamlit run app.py</pre>
             <div>
               <h4 class="font-black text-rose-900 text-lg">SANITARY ALERT: Product exceeds the safe INVIMA threshold</h4>
               <p class="text-sm text-rose-800 mt-1 leading-relaxed">
-                Meat has reached <strong>${finalCfu.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong>, 
+                Meat has reached <strong>${Math.round(finalCfu).toLocaleString()} CFU/g</strong>, 
                 exceeding by <strong>+${excess}%</strong> the legal threshold of <strong>1,000 CFU/g</strong> (Resolution 2674/2013).
               </p>
               <div class="mt-2.5 flex flex-wrap gap-2 text-xs font-semibold">
-                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⚠️ Critical Salmonellosis Risk</span>
+                <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⚠️ Infection Risk: ${riskPercent.toFixed(1)}% (${portionG}g serving)</span>
                 <span class="px-2.5 py-1 rounded-md bg-rose-200 text-rose-900">⛔ Lot Unfit for Human Consumption</span>
               </div>
             </div>
@@ -458,12 +525,13 @@ streamlit run app.py</pre>
             <div>
               <h4 class="font-black text-emerald-900 text-lg">SAFE PRODUCT</h4>
               <p class="text-sm text-emerald-800 mt-1 leading-relaxed">
-                The final bacterial load of <strong>${finalCfu.toLocaleString(undefined, {maximumFractionDigits: 0})} CFU/g</strong> 
+                The final bacterial load of <strong>${Math.round(finalCfu).toLocaleString()} CFU/g</strong> 
                 remains safely within the legal limit set by <strong>INVIMA Resolution 2674/2013</strong> (&lt; 1,000 CFU/g).
               </p>
               <div class="mt-2.5 flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">🛡️ Cold chain preserved</span>
-                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">Remaining safety margin: ${margin}%</span>
+                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">Safety margin: ${margin}%</span>
+                <span class="px-2.5 py-1 rounded-md bg-emerald-200 text-emerald-900">Infection Risk: ${riskPercent.toFixed(1)}%</span>
               </div>
             </div>
           </div>
@@ -569,13 +637,74 @@ streamlit run app.py</pre>
       };
 
       Plotly.react('plot-bact', [traceBact], layoutBact, { responsive: true, displayModeBar: false });
+
+      // Dynamic Argumentative Essay Generation
+      updateDynamicEssay(tAmb, tTravel, pkgName, finalTemp, finalCfu, portionG, riskPercent, nCrit);
     }
 
-    let simulationStarted = false;
+    function updateDynamicEssay(tAmb, tTravel, pkgName, finalTemp, finalCfu, portionG, riskPercent, nCrit) {
+      const essayContainer = document.getElementById('essay-content');
+      const statusInvima = finalCfu >= nCrit ? "EXCEEDS" : "remains WITHIN";
+      const statusClass = finalCfu >= nCrit ? "text-rose-600 font-bold" : "text-emerald-600 font-bold";
+
+      essayContainer.innerHTML = `
+        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
+          <h4 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">1</span>
+            Section 1: Problem Framing and Thesis Statement
+          </h4>
+          <p class="text-justify text-slate-700 leading-relaxed">
+            In developing urban areas such as Comuna 8 in Ibague, Colombia, the informal transportation of fresh poultry presents a critical challenge to public health. Small vendors often move perishable meat across the city using uninsulated containers without active refrigeration. Many residents accept this food degradation as an unavoidable reality of local commerce. However, thermal food spoilage is not an inevitable accident, but a preventable risk that can be measured and mitigated using biothermal simulation.
+          </p>
+        </article>
+
+        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
+          <h4 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">2</span>
+            Section 2: Live Scientific &amp; Mathematical Evidence
+          </h4>
+          <p class="text-justify text-slate-700 leading-relaxed">
+            According to Newton's Law of Cooling, heat transfer accelerates when external temperatures exceed food storage temperatures. Under the current simulated route conditions (Ambient Temperature: <strong>${tAmb.toFixed(1)} °C</strong>, Transit Duration: <strong>${tTravel.toFixed(1)} hours</strong>, Packaging: <strong>${pkgName}</strong>), internal chicken temperature rises from 4.0 °C to <strong>${finalTemp.toFixed(1)} °C</strong>. Applying binary fission kinetics (<em>N(t) = N0 * 2^n</em>), predicted <em>Salmonella spp.</em> concentration reaches <strong>${Math.round(finalCfu).toLocaleString()} CFU/g</strong>. This result <strong class="${statusClass}">${statusInvima}</strong> the legal safety limit of 1,000 CFU/g set by INVIMA Resolution 2674 of 2013. Furthermore, using the FAO/WHO Beta-Poisson dose-response model for a <strong>${portionG.toFixed(0)} g</strong> serving, consumers face an estimated <strong>${riskPercent.toFixed(1)}%</strong> probability of contracting salmonellosis.
+          </p>
+        </article>
+
+        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
+          <h4 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">3</span>
+            Section 3: Socio-Spatial Context &amp; Distributive Justice
+          </h4>
+          <p class="text-justify text-slate-700 leading-relaxed">
+            This biological vulnerability directly impacts marginalized communities in Comuna 8. Official data from DANE and the Unique Victims Registry (RUV) show that this area has a high concentration of low-income and displaced families facing food insecurity. Because these households have limited access to domestic refrigeration and healthcare, Comuna 8 bears the highest burden of food poisoning risks in the city. From an ethical perspective rooted in distributive justice, access to safe food must be protected as a fundamental human right.
+          </p>
+        </article>
+
+        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
+          <h4 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">4</span>
+            Section 4: Counterargument &amp; Operational Rebuttal
+          </h4>
+          <p class="text-justify text-slate-700 leading-relaxed">
+            Critics argue that solving this issue requires expensive refrigerated trucks that informal vendors cannot afford. However, industrial refrigeration is not the only effective solution. Biothermal simulation demonstrates that simple operational adjustments drastically reduce risk. By shifting delivery schedules to cooler early-morning hours (22 °C) and using basic styrofoam insulation (k = 0.01), vendors can keep bacterial loads below 1,000 CFU/g and reduce infection probability without expensive machinery.
+          </p>
+        </article>
+
+        <article class="p-4 md:p-5 rounded-xl bg-white/70 border border-sky-100 shadow-xs">
+          <h4 class="text-sm md:text-base font-bold text-sky-950 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 text-xs flex items-center justify-center font-bold">5</span>
+            Section 5: Conclusion &amp; Policy Recommendations
+          </h4>
+          <p class="text-justify text-slate-700 leading-relaxed">
+            In conclusion, food degradation during informal transport in Ibague is a predictable and preventable public health inequality. Local health authorities should use real-time simulation data to establish practical workshops for informal transporters, while community vendors should adopt early-morning routes and low-cost insulated containers to guarantee food safety in Comuna 8.
+          </p>
+        </article>
+      `;
+    }
 
     function handleUserInput() {
       if (!simulationStarted) {
         simulationStarted = true;
+
+        // Transition chart containers
         const phTemp = document.getElementById('plot-temp-placeholder');
         const phBact = document.getElementById('plot-bact-placeholder');
         if (phTemp) phTemp.classList.add('hidden');
@@ -585,6 +714,13 @@ streamlit run app.py</pre>
         if (pt) pt.classList.remove('hidden');
         if (pb) pb.classList.remove('hidden');
 
+        // Transition dynamic essay container
+        const phEssay = document.getElementById('essay-placeholder');
+        const contentEssay = document.getElementById('essay-content');
+        if (phEssay) phEssay.classList.add('hidden');
+        if (contentEssay) contentEssay.classList.remove('hidden');
+
+        // Transition header badge
         const badge = document.getElementById('status-badge');
         if (badge) {
           badge.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-sm";
@@ -594,8 +730,37 @@ streamlit run app.py</pre>
       updateDashboard();
     }
 
-    // Input event listeners
-    ['input-tamb', 'input-tviaje', 'select-empaque', 'input-t0'].forEach(id => {
+    function copyReportToClipboard() {
+      const essayEl = document.getElementById('essay-content');
+      if (!simulationStarted || !essayEl || essayEl.classList.contains('hidden')) {
+        alert("Please adjust a simulation parameter first to generate the report.");
+        return;
+      }
+      const textToCopy = essayEl.innerText;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const btn = document.getElementById('btn-copy-report');
+        if (btn) {
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '✓ Copied!';
+          btn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+          btn.classList.remove('bg-white', 'text-sky-800');
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+            btn.classList.add('bg-white', 'text-sky-800');
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error("Failed to copy report: ", err);
+      });
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    // Attach user input event listeners to all interactive controls
+    ['input-tamb', 'input-travel-time', 'select-packaging', 'input-portion', 'input-t0'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', handleUserInput);
@@ -603,7 +768,7 @@ streamlit run app.py</pre>
       }
     });
 
-    // Initial render
+    // Initial load: render LaTeX formulas in static elements without auto-running simulation
     document.addEventListener("DOMContentLoaded", () => {
       if (window.renderMathInElement) {
         renderMathInElement(document.body, {
@@ -613,7 +778,7 @@ streamlit run app.py</pre>
           ]
         });
       }
-      // Wait for user interaction before running simulation
+      // Zero simulation calculation is performed until user interacts with a control
     });
   </script>
 </body>
